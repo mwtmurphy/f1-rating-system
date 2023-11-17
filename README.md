@@ -61,6 +61,7 @@ Hat tip to my dad for annoying a family friend at a recent birthday party to giv
 ## Ideas
 
 1. Add 1950 - 1985 data for teams with multiple drivers.
+2. Add qualifying and sprint races.
 2. Distance apart should be added as a scalar that influence gains/losses from race points scored.
 3. Gains/losses should be scaled dependent on number of races in a season and year of season.
 4. Spins and accidents should be penalised in qualifying, sprints and races.
