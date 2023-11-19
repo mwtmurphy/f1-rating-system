@@ -26,21 +26,23 @@ There are many opinions. Is it Fangio, Senna, Michael Schumacher, Hamilton. Let'
 
 ### Prerequisites
 
-This project is built using Python 3.10.12 and Poetry 1.5.0. Install these dependencies before continuing.
+This project is built using Make, Python 3.10.12 and Poetry 1.5.0. Install these dependencies before continuing.
 
 ### Data 
 
-Download the CSV database tables from [^1] and unzip them into the `data` directory. The table structure for these tables can be found in [^2].
+Download the CSV database tables from [^1] and unzip them into `data/raw`. The table structure for these tables can be found in [^2].
 
 ### Code
 
-Run `poetry install` in a command line interface (e.g. iTerm) to install package dependencies for this project.
+Run `make env` in a command line interface (e.g. iTerm) to install package dependencies for this project.
 
 ## Usage
 
 Exploratory data analysis (EDA) can be found in `notebooks/eda.ipynb`. The method used to score race outcomes is based on a modified ELO formula found in [^3].
 
-The streamlit app built from this EDA will be found in `src/f1_elo`.
+The streamlit app built from this EDA is found in `src/f1_elo`.
+
+Run `make app` to explore the app locally.
 
 ## Testing
 

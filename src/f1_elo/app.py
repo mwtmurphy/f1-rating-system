@@ -4,24 +4,21 @@ import streamlit as st
 
 # data import
 @st.cache_data
-def load_data(in_dir: str = "data/prod") -> pd.DataFrame:
-    '''Returns results dataframe with ELO scores'''
-    return pd.read_csv(f"{in_dir}/results.csv")
+def load_data(in_dir: str = "data/prod") -> tuple:
+    '''Returns dataframe with ELO scores for drivers under GOAT 
+    consideration and dataframe with days top ranked'''
+    
+    gott_df = pd.read_csv(f"{in_dir}/gott.csv")
+    gott_days = pd.read_csv(f"{in_dir}/gott_days.csv")
 
-res_df = load_data()
+    return gott_df, gott_days
 
-st.title("F1 Elo")
+gott_df, gott_days = load_data()
 
-# data cleaning
-min_races = res_df.groupby("year")["round"].nunique().sort_values().iloc[0] # shortest season
-gott_df = res_df.sort_values(["year", "round", "score"], ascending=[True, True, False]).drop_duplicates(['year','round'])
-gott_days = gott_df["driverId"].value_counts()
-gott_drivers = set(gott_days[gott_days > min_races].index)
-sub_df = res_df[res_df["driverId"].isin(gott_drivers)].sort_values(["year", "round"])
-
-# data vis
 st.markdown(
 """
+# F1 Elo
+
 The question that has ruined many a social event: 
 
 > Who is the F1 greatest of all time (GOAT)?  
@@ -47,14 +44,13 @@ drivers to be considered the GOAT.
 """
 )
 
-fig = px.line(sub_df, x="date", y="score", color="driverId")
+fig = px.line(gott_df, x="date", y="score", color="driverId")
 st.plotly_chart(fig)
-
-st.table(gott_days[gott_days > min_races])
+st.table(gott_days)
 
 st.markdown(
 f"""
-# The data GOAT = {gott_days.index[0]}
+# The data GOAT = {gott_days['driverId'].iloc[0]}
 
 ## Limitations
 
