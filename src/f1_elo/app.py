@@ -12,43 +12,72 @@ res_df = load_data()
 
 st.title("F1 Elo")
 
-# user input
-years = st.multiselect("Race years to display", list(set(res_df["year"])), default=[2023])
-
 # data cleaning
-sub_df = res_df.copy()
-if years:
-    drivers = list(set(sub_df.loc[sub_df["year"].isin(years), "driverId"]))
-    sub_df = sub_df[sub_df["driverId"].isin(drivers)]
-sub_df = sub_df.sort_values(["year", "round"])
-
-# data cleaning - 2023 analysis
-drivers = set(res_df.loc[res_df["year"] == 2023, "driverId"])
-cur_df = res_df[(res_df["year"] == 2023) & res_df["driverId"].isin(drivers)]
-round_df = cur_df.groupby("driverId")["round"].describe()[["min", "max"]].reset_index()
-
-for ix, row in round_df.iterrows():
-    score_1 = cur_df.loc[(cur_df["driverId"] == row["driverId"]) & (cur_df["round"] == row["min"]), "score"].iloc[0]
-    score_2 = cur_df.loc[(cur_df["driverId"] == row["driverId"]) & (cur_df["round"] == row["max"]), "score"].iloc[0]
-
-    round_df.loc[round_df["driverId"] == row["driverId"], "min"] = score_1
-    round_df.loc[round_df["driverId"] == row["driverId"], "max"] = score_2
-
-round_df["change"] = round_df["max"] - round_df["min"]
-round_df.columns = ["Driver ID", "First round ELO", "Last round ELO", "Change"]
-round_df = round_df.set_index("Driver ID").sort_values("Change", ascending=False)
-
-# data cleaning - GOATs
-goat_df = res_df.sort_values(["year", "round", "score"], ascending=[True, True, False]).drop_duplicates(['year','round'])
-goat_df = goat_df["driverId"].value_counts().reset_index().head(10)
-goat_df.columns = ["Driver ID", "Number of races"]
+min_races = res_df.groupby("year")["round"].nunique().sort_values().iloc[0] # shortest season
+gott_df = res_df.sort_values(["year", "round", "score"], ascending=[True, True, False]).drop_duplicates(['year','round'])
+gott_days = gott_df["driverId"].value_counts()
+gott_drivers = set(gott_days[gott_days > min_races].index)
+sub_df = res_df[res_df["driverId"].isin(gott_drivers)].sort_values(["year", "round"])
 
 # data vis
+st.markdown(
+"""
+The question that has ruined many a social event: 
+
+> Who is the F1 greatest of all time (GOAT)?  
+
+There are many opinions. Is it Fangio, Senna, Michael Schumacher, Hamilton. Let's apply some data 
+science to the problem to see if we can identify - at least - the data GOAT.
+
+For races from 1986 Round 1 - 2023 Brazil, I've created Elo scores (used in chess) for all driver 
+inter-team 1v1s due to identical vehicles. This allows to identify the greatest of their time drivers.
+
+## Method
+
+All drivers start with a score of 1500. With each win/loss this score increases/decreases over time. 
+A win over a high-ranked teammate yields a greater increase than a win over a low-ranked teammate.
+
+The degree of the win/loss also influences the score. If both drivers score points, their ranking will 
+increase. If one driver scores 25 and the other 1 however, their increase is scaled respectively.
+
+## Results
+
+Taking drivers who were top ranked for at least 16 races (shortest season), this allows me to find
+drivers to be considered the GOAT.
+"""
+)
+
 fig = px.line(sub_df, x="date", y="score", color="driverId")
 st.plotly_chart(fig)
 
-st.title("Best perfomers in 2023")
-st.table(round_df)
+st.table(gott_days[gott_days > min_races])
 
-st.title("Races as greatest driver active")
-st.table(goat_df)
+st.markdown(
+f"""
+# The data GOAT = {gott_days.index[0]}
+
+## Limitations
+
+This approach has clear limitations that are easy to spot:
+
+1. Data begins at 1986, during some drivers careers.
+2. Mechanical failures affect earlier seasons to a larger degree than
+later seasons.
+3. Drivers with longer careers have higher scores.
+4. Seasons with more races give those drivers more chances to improve their scores.
+5. Dominant cars give drivers an easier chance to score more points independent of skill.
+6. Not all drivers join the sport with the same skill level, e.g. Hamilton was the F2 champion, Senna
+was a 3x Formula Ford and F3 champion.
+
+## Next steps
+
+1. Add 1950 - 1985 data for teams with multiple drivers.
+2. Add sprint races.
+3. Add DNFs and type of DNFs (e.g. crashes = penalty, mechanical failures = no penalty).
+4. Scale score change dependent on number of races in a season (less races = less chance to improve).
+5. Add weighting dependent on constructors finishing position for year (e.g. expected points - realised points).
+6. Add distance apart for finishers (points scored for 25s diff > points scored for 5s).
+7. Scale initial Elo score dependent on racing history pre-F1.
+
+"""
+)
