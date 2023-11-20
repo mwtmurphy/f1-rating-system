@@ -62,13 +62,11 @@ Hat tip to my dad for annoying a family friend at a recent birthday party to giv
 
 ## Ideas
 
-1. Add 1950 - 1985 data for teams with multiple drivers.
-2. Add sprint races.
-3. Add DNFs and type of DNFs (e.g. crashes = penalty, mechanical failures = no penalty).
-4. Scale score change dependent on number of races in a season (less races = less chance to improve).
-5. Add weighting dependent on constructors finishing position for year (e.g. expected points - realised points).
-6. Add distance apart for finishers (points scored for 25s diff > points scored for 5s).
-7. Scale initial Elo score dependent on racing history pre-F1.
+1. Add sprint races.
+2. Add DNFs and type of DNFs (e.g. crashes = penalty, mechanical failures = no penalty).
+3. Add weighting dependent on constructors finishing position for year (e.g. expected points - realised points).
+4. Add distance apart for finishers (points scored for 25s diff > points scored for 5s).
+5. Scale initial Elo score dependent on racing history pre-F1.
 
 [^1]: [CSV DB table download](https://ergast.com/mrd/db/#csv) (last accessed 16/11/23)
 [^2]: [CSV DB table structure](https://ergast.com/docs/f1db_user_guide.txt) (last accessed 16/11/23)

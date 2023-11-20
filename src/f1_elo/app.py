@@ -58,23 +58,18 @@ f"""
 
 ## Limitations
 
-This approach has clear limitations that are easy to spot:
-
-2. Driver and non-driver retirements aren't accounted for.
-3. Drivers with longer careers have higher scores.
-4. Seasons with more races give those drivers more chances to improve their scores.
-5. Dominant cars give drivers an easier chance to score more points independent of skill.
-6. Not all drivers join the sport with the same skill level, e.g. Hamilton was an F2 and F3 champion, Senna
+1. Driver and non-driver retirements aren't accounted for.
+2. Drivers with longer careers have higher scores.
+3. Dominant cars give drivers an easier chance to score more points independent of skill.
+4. Not all drivers join the sport with the same skill level, e.g. Hamilton was an F2 and F3 champion, Senna
 was a 3x Formula Ford and F3 champion.
 
 ## Next steps
 
-2. Add sprint races.
-3. Add DNFs and type of DNFs (e.g. crashes = penalty, mechanical failures = no penalty).
-4. Scale score change dependent on number of races in a season (less races = less chance to improve).
-5. Add weighting dependent on constructors finishing position for year (e.g. expected points - realised points).
-6. Add distance apart for finishers (points scored for 25s diff > points scored for 5s).
-7. Scale initial Elo score dependent on racing history pre-F1.
-
+1. Add sprint races.
+2. Add DNFs and type of DNFs (e.g. crashes = penalty, mechanical failures = no penalty).
+3. Add weighting dependent on constructors finishing position for year (e.g. expected points - realised points).
+4. Add distance apart for finishers (points scored for 25s diff > points scored for 5s).
+5. Scale initial Elo score dependent on racing history pre-F1.
 """
 )
