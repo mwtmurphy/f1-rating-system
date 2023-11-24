@@ -7,7 +7,7 @@ st.set_page_config(layout="wide")
 
 # data import
 @st.cache_data
-def load_data(in_dir: str = "data/prod") -> tuple:
+def load_data(in_dir: str = "data/processed") -> tuple:
     '''Returns dataframe with ELO scores for drivers under GOAT 
     consideration and dataframe with days top ranked'''
     
