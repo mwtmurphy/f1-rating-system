@@ -155,4 +155,11 @@ cython_debug/
 ### Additions ###
 
 # Data
+data/interim/*.csv
 data/raw/*.csv
+
+# DVC (momentary whilst identifying which files to track)
+.dvcignore
+.dvc/*
+dvclive
+dvc.yaml
