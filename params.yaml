@@ -1,0 +1,27 @@
+#base:
+#  random_state: 42
+
+data:
+  drivers_csv: 'data/raw/drivers.csv'
+  results_csv: 'data/raw/results.csv'
+  races_csv: 'data/raw/races.csv'
+  preprocessed_path: 'data/interim/preprocessed_data.csv'
+  features_path: 'data/interim/features.csv'
+  modelled_path: 'data/interim/modelled_data.csv'
+  gott_path: 'data/processed/gott.csv'
+  rank_path: 'data/processed/rank.csv'
+  
+
+model:
+  opt_params:
+    'c_bounds': [10, 1000]
+    'k_bounds': [10, 1000]
+    'n_iter': 20
+    'init_points': 20
+    'random_state': 1
+  start_score: 1500
+  #model_path: 'models/model.joblib'
+
+#reports:
+#  metrics_file: 'reports/metrics.json'
+#  confusion_matrix_image: 'reports/confusion_matrix.png'

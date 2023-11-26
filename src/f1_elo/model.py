@@ -1,15 +1,13 @@
 import itertools
-import os
+import yaml
 
 import bayes_opt
-import dotenv
 import dvclive
 import pandas as pd
 
 
-dotenv.load_dotenv()
-ROOT_DIR = os.getenv("ROOT_DIR")
-DATA_DIR = f"{ROOT_DIR}/data"
+with open("params.yaml") as conf_file:
+    CONFIG = yaml.safe_load(conf_file)
 
 
 def model_data(k: float, c: float, export: bool = False) -> float:
@@ -17,8 +15,8 @@ def model_data(k: float, c: float, export: bool = False) -> float:
     export == True, exports modelled data to 'interim' data folder for 
     data reporting.'''
 
-    cle_df = pd.read_csv(f"{DATA_DIR}/interim/features.csv")
-    elo_scores = {id: 1500 for id in set(cle_df["driverId"])}
+    cle_df = pd.read_csv(CONFIG["data"]["features_path"])
+    elo_scores = {id: CONFIG["model"]["start_score"] for id in set(cle_df["driverId"])}
     yr_rounds = cle_df.groupby("year")["round"].nunique()
     cle_df["elo_score"] = None
     exp, out = [], []
@@ -99,37 +97,34 @@ def model_data(k: float, c: float, export: bool = False) -> float:
         # SEE ONLY FOCUSSES ON ERROR OF E_A E_B VS OUTCOME
     
     else:
-        cle_df.to_csv(f"{DATA_DIR}/interim/modelled_data.csv", index=False)
+        cle_df.to_csv(CONFIG["data"]["modelled_path"], index=False)
 
 
 if __name__=="__main__":
 
     # find optimal parameters
-    param_bounds = {
-        "k": (1, 1000),
-        "c": (1, 1000)
-    }
+    opt_params = CONFIG["model"]["opt_params"]
     optimiser = bayes_opt.BayesianOptimization(
         f=model_data,
-        pbounds=param_bounds,
-        random_state=1,
+        pbounds={
+            "k": opt_params["k_bounds"],
+            "c": opt_params["c_bounds"]
+        },
+        random_state=opt_params["random_state"],
         allow_duplicate_points=True
     )
 
-    optimiser.maximize(init_points=20, n_iter=20)
+    optimiser.maximize(init_points=opt_params["init_points"], n_iter=opt_params["n_iter"])
     opt_results = optimiser.max
     opt_k = float(opt_results["params"]["k"])
     opt_c = float(opt_results["params"]["c"])
     opt_sse = float(-opt_results["target"])
 
-    # log and print experiment outcome
+    # log experiment outcome
     with dvclive.Live() as live:
         live.log_param("k", opt_k)
         live.log_param("c", opt_c)
         live.log_metric("SSE", opt_sse)
-
-    print()
-    print(opt_results)
 
     # create final model data
     model_data(k=opt_k, c=opt_c, export=True)

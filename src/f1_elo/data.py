@@ -1,19 +1,17 @@
-import os
+import yaml
 
-import dotenv
 import pandas as pd
 
-dotenv.load_dotenv()
-ROOT_DIR = os.getenv("ROOT_DIR")
-DATA_DIR = f"{ROOT_DIR}/data"
+with open("params.yaml") as conf_file:
+    CONFIG = yaml.safe_load(conf_file)
 
 def preprocess_data():
     '''Exports preprocessed data to 'interim' data folder for creating
     features'''
 
     # merge raw data required for scoring
-    results_df = pd.read_csv(f"{DATA_DIR}/raw/results.csv")
-    races_df = pd.read_csv(f"{DATA_DIR}/raw/races.csv")
+    results_df = pd.read_csv(CONFIG["data"]["results_csv"])
+    races_df = pd.read_csv(CONFIG["data"]["races_csv"])
     pre_df = races_df.merge(results_df, on="raceId", how="inner", validate="1:m").drop(columns=["raceId"])
 
     # preprocess data
@@ -23,7 +21,7 @@ def preprocess_data():
     sort_order = ["year", "round", "position", "grid"]
     pre_df = pre_df[col_order].sort_values(sort_order)
 
-    pre_df.to_csv(f"{DATA_DIR}/interim/preprocessed_data.csv", index=False)
+    pre_df.to_csv(CONFIG["data"]["preprocessed_path"], index=False)
 
 if __name__=="__main__":
     preprocess_data()

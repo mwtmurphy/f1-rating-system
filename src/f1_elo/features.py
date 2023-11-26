@@ -1,11 +1,11 @@
-import os
+import yaml
 
-import dotenv
 import pandas as pd
 
-dotenv.load_dotenv()
-ROOT_DIR = os.getenv("ROOT_DIR")
-DATA_DIR = f"{ROOT_DIR}/data"
+
+with open("params.yaml") as conf_file:
+    CONFIG = yaml.safe_load(conf_file)
+    
 
 # CONSTRUCTOR_STATUSES = [
 #     "engine", "transmission", "clutch", "electrical", "hydraulics", "gearbox", "radiator", 
@@ -50,7 +50,7 @@ def create_features():
     '''Exports features data to 'interim' data folder for creating
     model'''
 
-    pre_df = pd.read_csv(f"{DATA_DIR}/interim/preprocessed_data.csv")
+    pre_df = pd.read_csv(CONFIG["data"]["preprocessed_path"])
 
     # infer positions for non-finishers using qualifying position 
     car_df = pre_df[["year", "round", "grid"]].drop_duplicates()
@@ -68,7 +68,7 @@ def create_features():
     cle_df = cle_df.drop(columns=["grid", "position"])
 
     # export data
-    cle_df.to_csv(f"{DATA_DIR}/interim/features.csv", index=False)
+    cle_df.to_csv(CONFIG["data"]["features_path"], index=False)
 
 # def map_status(status: str) -> str:
 

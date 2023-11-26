@@ -1,22 +1,27 @@
+import yaml
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
 # app config
 st.set_page_config(layout="wide")
+with open("params.yaml") as conf_file:
+    CONFIG = yaml.safe_load(conf_file)
+
 
 # data import
 @st.cache_data
-def load_data(in_dir: str = "data/processed") -> tuple:
+def load_data() -> tuple:
     '''Returns dataframe with ELO scores for drivers under GOAT 
     consideration and dataframe with days top ranked'''
     
-    gott_df = pd.read_csv(f"{in_dir}/gott.csv")
-    gott_days = pd.read_csv(f"{in_dir}/gott_days.csv")
+    gott_df = pd.read_csv(CONFIG["data"]["gott_path"])
+    rank_df = pd.read_csv(CONFIG["data"]["rank_path"], index_col=0)
 
-    return gott_df, gott_days
+    return gott_df, rank_df
 
-gott_df, gott_days = load_data()
+gott_df, rank_df = load_data()
 
 # data vis
 st.markdown(
@@ -48,13 +53,13 @@ drivers to be considered the GOAT.
 """
 )
 
-fig = px.line(gott_df, x="date", y="score", color="driverRef")
+fig = px.line(gott_df, x="date", y="elo_score", color="driverName")
 st.plotly_chart(fig, use_container_width=True)
-st.table(gott_days.iloc[:10])
+st.table(rank_df.iloc[:10])
 
 st.markdown(
 f"""
-# The data GOAT = {gott_days['driverRef'].iloc[0]}
+# The data GOAT = {rank_df["Driver name"].iloc[0]}
 
 ## Limitations
 

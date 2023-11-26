@@ -14,6 +14,9 @@ data_model: ${INT_DIR}/features.csv
 data_preprocessed: ${RAW_DIR}/races.csv ${RAW_DIR}/results.csv
 	poetry run python ${SRC_DIR}/data.py
 
+data_report: ${INT_DIR}/modelled_data.csv
+	poetry run python ${SRC_DIR}/report.py
+
 env:
 	poetry install
 
