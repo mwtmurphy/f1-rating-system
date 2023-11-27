@@ -160,6 +160,5 @@ data/raw/*.csv
 
 # DVC (momentary whilst identifying which files to track)
 .dvcignore
-.dvc/*
-dvclive
+.dvc
 dvc.yaml

@@ -5,6 +5,12 @@ SRC_DIR = src/f1_elo
 app:
 	streamlit run ${SRC_DIR}/app.py
 
+data_e2e:
+	make data_preprocessed
+	make data_features
+	make data_model
+	make data_report
+
 data_features: ${INT_DIR}/preprocessed_data.csv
 	poetry run python ${SRC_DIR}/features.py
 

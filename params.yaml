@@ -1,9 +1,8 @@
-#base:
-#  random_state: 42
-
 data:
+  constructors_csv: 'data/raw/constructors.csv'
   drivers_csv: 'data/raw/drivers.csv'
   results_csv: 'data/raw/results.csv'
+  status_csv: 'data/raw/status.csv'
   races_csv: 'data/raw/races.csv'
   preprocessed_path: 'data/interim/preprocessed_data.csv'
   features_path: 'data/interim/features.csv'
@@ -14,14 +13,11 @@ data:
 
 model:
   opt_params:
-    'c_bounds': [10, 1000]
-    'k_bounds': [10, 1000]
+    pbounds:
+      'c': [10, 1000]
+      'k': [10, 1000]
+      'w': [0, 2]
     'n_iter': 20
     'init_points': 20
     'random_state': 1
   start_score: 1500
-  #model_path: 'models/model.joblib'
-
-#reports:
-#  metrics_file: 'reports/metrics.json'
-#  confusion_matrix_image: 'reports/confusion_matrix.png'
