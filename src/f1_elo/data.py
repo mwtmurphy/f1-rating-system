@@ -17,7 +17,7 @@ def preprocess_data():
     # preprocess data
     pre_df["position"] = pre_df["position"].replace("\\N", None).astype(float)
 
-    col_order = ["year", "round", "date", "constructorId", "driverId", "grid", "position"]#, "statusId"]
+    col_order = ["year", "round", "date", "constructorId", "driverId", "grid", "position", "statusId"]
     sort_order = ["year", "round", "position", "grid"]
     pre_df = pre_df[col_order].sort_values(sort_order)
 
@@ -25,15 +25,3 @@ def preprocess_data():
 
 if __name__=="__main__":
     preprocess_data()
-
-# CODE TO BE USED AT A LATER DATE
-
-#drivers_df = pd.read_csv(f"{DATA_DIR}/drivers.csv")[["driverId", "driverRef"]]
-#constructors_df = pd.read_csv(f"{DATA_DIR}/constructors.csv")[["constructorId", "constructorRef"]]
-#status_df = pd.read_csv(f"{DATA_DIR}/status.csv")
-
-#raw_df = raw_df.merge(drivers_df, on="driverId", how="left")
-#raw_df = raw_df.merge(constructors_df, on="constructorId", how="left")
-#raw_df = raw_df.merge(status_df, on="statusId", how="left")
-
-#raw_df = raw_df[["year", "round", "date", "constructorRef", "driverRef", "grid", "position", "status"]]

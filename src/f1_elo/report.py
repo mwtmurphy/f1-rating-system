@@ -17,10 +17,9 @@ def make_report_data():
     vis_df = mod_df.merge(drivers_df[["driverId", "driverName"]], on=["driverId"], how="left")
 
     # get drivers to be considered
-    min_races = 2 * vis_df.groupby("year")["round"].nunique().sort_values().iloc[0] # 2x shortest season
-    gott_df = vis_df.sort_values(["year", "round", "elo_score"], ascending=[True, True, False]).drop_duplicates(["year", "round"])
-    gott_days = gott_df["driverId"].value_counts()
-    gott_drivers = set(gott_days[gott_days > min_races].index)
+    gott_df = vis_df.sort_values(["year", "round", "driverScore"], ascending=[True, True, False]).drop_duplicates(["year", "round"])
+    gott_days = gott_df["driverId"].value_counts().iloc[:10]
+    gott_drivers = set(gott_days.index)
     
     # create data to visualise greatest drivers over time
     gott_df = vis_df[vis_df["driverId"].isin(gott_drivers)].sort_values(["year", "round"])
@@ -31,7 +30,7 @@ def make_report_data():
     rank_df = rank_df[["driverName", "count"]].rename(columns={
         "driverName": "Driver name",
         "count": "Races as top ranked"
-    }).head(10)
+    })
     rank_df.index += 1
 
     # export data

@@ -1,4 +1,5 @@
 import itertools
+import typing
 import yaml
 
 import bayes_opt
@@ -10,46 +11,39 @@ with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
 
 
-def model_data(k: float, c: float, export: bool = False) -> float:
-    '''If export == False, returns negative SSE based on k and c. If
-    export == True, exports modelled data to 'interim' data folder for 
-    data reporting.'''
+def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Union[float, None]:
+    '''If export == False, returns negative RMSEE based on params. 
+    If export == True, exports modelled data to 'interim' data folder 
+    for data reporting.'''
 
     cle_df = pd.read_csv(CONFIG["data"]["features_path"])
-    elo_scores = {id: CONFIG["model"]["start_score"] for id in set(cle_df["driverId"])}
-    yr_rounds = cle_df.groupby("year")["round"].nunique()
-    cle_df["elo_score"] = None
+    dri_scores = {id: CONFIG["model"]["start_score"] for id in set(cle_df["driverId"])}
+    con_scores = {id: CONFIG["model"]["start_score"] for id in set(cle_df["constructorId"])}
+    cle_df[["constructorScore", "driverScore"]] = None
     exp, out = [], []
-    #l = 40
 
-    yrc_df = cle_df[["year", "round", "constructorId"]].drop_duplicates()
-    for _, (yr, rnd, ctr) in yrc_df.iterrows():
-        valid_ix = (cle_df["year"] == yr) & (cle_df["round"] == rnd) & (cle_df["constructorId"] == ctr)
-        sub_df = cle_df[valid_ix]
+    yr_df = cle_df[["year", "round"]].drop_duplicates()
+    for _, (yr, rnd) in yr_df.iterrows():
+        valid_ix = (cle_df["year"] == yr) & (cle_df["round"] == rnd)
+        sub_ix = valid_ix & (cle_df["status"].isin(["finished", "driver retirement"]))
+        
+        rnd_dri_scores = {dri: {"diff": 0, "n": 0} for dri in cle_df.loc[sub_ix, "driverId"]}
+        rnd_con_scores = {dri: {"diff": 0, "n": 0} for dri in cle_df.loc[sub_ix, "constructorId"]}
 
-        round_scores = {dvr: {"diff": 0, "n": 0} for dvr in sub_df["driverId"]}
-        for ix_1, ix_2 in itertools.combinations(sub_df.index, 2):
-            dvr_a = cle_df.loc[ix_1, "driverId"]
-            elo_a = elo_scores[dvr_a]
+        for ix_1, ix_2 in itertools.combinations(cle_df[sub_ix].index, 2):
+            dri_a = cle_df.loc[ix_1, "driverId"]
+            con_a = cle_df.loc[ix_1, "constructorId"]
+            elo_a = dri_scores[dri_a] + (w * con_scores[con_a])
             pos_a = cle_df.loc[ix_1, "mapPosition"]
-            #poi_a = cle_df.loc[ix_1, "mapPoints"]
 
-            dvr_b = cle_df.loc[ix_2, "driverId"]
-            elo_b = elo_scores[dvr_b]
+            dri_b = cle_df.loc[ix_2, "driverId"]
+            con_b = cle_df.loc[ix_2, "constructorId"]
+            elo_b = dri_scores[dri_b] + (w * con_scores[con_b])
             pos_b = cle_df.loc[ix_2, "mapPosition"]
-            #poi_b = cle_df.loc[ix_2, "mapPoints"]
 
             # continue if drivers in same car
             if pos_a == pos_b:
                 continue
-
-            # calculate points influence
-            # if poi_a + poi_b == 0:
-            #     s_a = 0.5
-            #     s_b = 0.5
-            # else:
-            #     s_a = poi_a / (poi_a + poi_b)
-            #     s_b = poi_b / (poi_a + poi_b)
 
             # calculate position influence
             q_a = 10 ** (elo_a / c)
@@ -66,37 +60,45 @@ def model_data(k: float, c: float, export: bool = False) -> float:
                 o_a = 0
                 o_b = 1
                 
-            # calculate score change and update round_scores
-            diff_a = ((k ) * (o_a - e_a)) #+ ((l / yr_rounds[yr]) * s_a)
-            diff_b = ((k ) * (o_b - e_b)) #+ ((l / yr_rounds[yr]) * s_b)
+            # calculate score change and update round scores
+            diff_a = k * (o_a - e_a)
+            diff_b = k * (o_b - e_b)
 
-            round_scores[dvr_a]["diff"] += diff_a
-            round_scores[dvr_a]["n"] += 1
+            rnd_con_scores[con_a]["diff"] += diff_a
+            rnd_con_scores[con_a]["n"] += 1
+            rnd_dri_scores[dri_a]["diff"] += diff_a
+            rnd_dri_scores[dri_a]["n"] += 1
 
-            round_scores[dvr_b]["diff"] += diff_b
-            round_scores[dvr_b]["n"] += 1
+            rnd_con_scores[con_b]["diff"] += diff_b
+            rnd_con_scores[con_b]["n"] += 1
+            rnd_dri_scores[dri_b]["diff"] += diff_b
+            rnd_dri_scores[dri_b]["n"] += 1
 
             # store expected and final values
             exp += [e_a, e_b]
             out += [o_a, o_b]
         
-        # insert score for end of round
-        for dvr in round_scores.keys():
-            if round_scores[dvr]["n"] != 0: # more than 1 car on grid
-                elo_scores[dvr] += (round_scores[dvr]["diff"] / round_scores[dvr]["n"])
-            
-            cle_df.loc[valid_ix & (cle_df["driverId"] == dvr), "elo_score"] = elo_scores[dvr]
+        # update driver elo scores for finishing drivers and driver-caused retirements
+        for dri in rnd_dri_scores.keys():
+            if rnd_dri_scores[dri]["n"] != 0: # more than 1 car on grid
+                dri_scores[dri] += (rnd_dri_scores[dri]["diff"] / rnd_dri_scores[dri]["n"])
+                
+        cle_df.loc[sub_ix, "driverScore"] = cle_df.loc[sub_ix, "driverId"].map(dri_scores)
 
+        # update constructor elo scores for finishing drivers
+        for con in rnd_con_scores.keys():
+            if rnd_con_scores[con]["n"] != 0: # more than 1 car on grid
+                con_scores[con] += (rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
+        
+        cle_df.loc[sub_ix, "constructorScore"] = cle_df.loc[sub_ix, "constructorId"].map(con_scores)
+    
     if export == False:
         err_df = pd.DataFrame({"pred": exp, "true": out})
         err_df["squared_error"] = (err_df["true"] - err_df["pred"]) ** 2
-        neg_sse = -err_df["squared_error"].sum()
+        neg_rmse = -(pow(err_df["squared_error"].sum() / err_df.shape[0], 0.5))
+        return neg_rmse
     
-        return neg_sse 
-        # REPLACE WITH NDCG TO BEGIN BRINGING IN OTHER PARAMETERS, SSE FALLS OVER BRINGING IN POINTS 
-        # SEE ONLY FOCUSSES ON ERROR OF E_A E_B VS OUTCOME
-    
-    else:
+    else:    
         cle_df.to_csv(CONFIG["data"]["modelled_path"], index=False)
 
 
@@ -106,26 +108,34 @@ if __name__=="__main__":
     opt_params = CONFIG["model"]["opt_params"]
     optimiser = bayes_opt.BayesianOptimization(
         f=model_data,
-        pbounds={
-            "k": opt_params["k_bounds"],
-            "c": opt_params["c_bounds"]
-        },
+        pbounds=opt_params["pbounds"],
         random_state=opt_params["random_state"],
         allow_duplicate_points=True
     )
 
-    optimiser.maximize(init_points=opt_params["init_points"], n_iter=opt_params["n_iter"])
+    optimiser.maximize(
+        init_points=opt_params["init_points"], 
+        n_iter=opt_params["n_iter"]
+    )
     opt_results = optimiser.max
     opt_k = float(opt_results["params"]["k"])
     opt_c = float(opt_results["params"]["c"])
-    opt_sse = float(-opt_results["target"])
+    opt_w = float(opt_results["params"]["w"])
+    opt_rmse = float(-opt_results["target"])
 
     # log experiment outcome
-    with dvclive.Live() as live:
+    with dvclive.Live(exp_name="elo+ava+cs+es-2") as live:
         live.log_param("k", opt_k)
         live.log_param("c", opt_c)
-        live.log_metric("SSE", opt_sse)
+        live.log_param("w", opt_w)
+        live.log_metric("RMSE", opt_rmse)
 
     # create final model data
-    model_data(k=opt_k, c=opt_c, export=True)
+    model_data(k=opt_k, c=opt_c, w=opt_w, export=True)
 
+# ELO = standard algo
+# AVA = all vs all
+# CS = constructor scores
+# ES = end statuses
+# CP = constructor penalty
+# RAN = random expected outcome
