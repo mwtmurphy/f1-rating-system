@@ -83,14 +83,14 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
             if rnd_dri_scores[dri]["n"] != 0: # more than 1 car on grid
                 dri_scores[dri] += (rnd_dri_scores[dri]["diff"] / rnd_dri_scores[dri]["n"])
                 
-        cle_df.loc[sub_ix, "driverScore"] = cle_df.loc[sub_ix, "driverId"].map(dri_scores)
+        cle_df.loc[valid_ix, "driverScore"] = cle_df.loc[valid_ix, "driverId"].map(dri_scores)
 
         # update constructor elo scores for finishing drivers
         for con in rnd_con_scores.keys():
             if rnd_con_scores[con]["n"] != 0: # more than 1 car on grid
                 con_scores[con] += (rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
         
-        cle_df.loc[sub_ix, "constructorScore"] = cle_df.loc[sub_ix, "constructorId"].map(con_scores)
+        cle_df.loc[valid_ix, "constructorScore"] = cle_df.loc[valid_ix, "constructorId"].map(con_scores)
     
     if export == False:
         err_df = pd.DataFrame({"pred": exp, "true": out})
