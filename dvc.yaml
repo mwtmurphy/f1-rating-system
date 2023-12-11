@@ -5,3 +5,23 @@ metrics:
 plots:
 - dvclive/plots/metrics:
     x: step
+stages:
+  preprocess_data:
+    cmd: python src/f1_elo/data.py
+    deps:
+    - src/f1_elo/data.py
+    params:
+    - data.results_csv
+    - data.races_csv
+    outs:
+    - data/interim/preprocessed_data.csv
+  clean_data:
+    cmd: python src/f1_elo/features.py
+    deps:
+    - src/f1_elo/features.py
+    params:
+    - preprocess_data
+    - data.preprocessed_path
+    - data.status_csv
+    outs:
+    - data/interim/features.csv
