@@ -1,0 +1,72 @@
+schema: '2.0'
+stages:
+  preprocess_data:
+    cmd: make data_preprocessed
+    deps:
+    - path: src/f1_elo/data.py
+      hash: md5
+      md5: bae010dd0806c163353a0c43da233154
+      size: 922
+    params:
+      params.yaml:
+        data.races_csv: data/raw/races.csv
+        data.results_csv: data/raw/results.csv
+    outs:
+    - path: data/interim/preprocessed_data.csv
+      hash: md5
+      md5: e9244ee3a29bb075e34f2acf5333c074
+      size: 864985
+  clean_data:
+    cmd: make data_features
+    deps:
+    - path: data/interim/preprocessed_data.csv
+      hash: md5
+      md5: e9244ee3a29bb075e34f2acf5333c074
+      size: 864985
+    - path: src/f1_elo/features.py
+      hash: md5
+      md5: a682cde0d3a7aa30dbf1f6a893adec9f
+      size: 3257
+    params:
+      params.yaml:
+        data.preprocessed_path: data/interim/preprocessed_data.csv
+        data.status_csv: data/raw/status.csv
+    outs:
+    - path: data/interim/features.csv
+      hash: md5
+      md5: bc992432d3e3d3cea1dea3cc274cf109
+      size: 1206388
+  create_model:
+    cmd: make data_model
+    deps:
+    - path: data/interim/features.csv
+      hash: md5
+      md5: bc992432d3e3d3cea1dea3cc274cf109
+      size: 1206388
+    - path: src/f1_elo/model.py
+      hash: md5
+      md5: f5674efd42fe9df16a3e65b392708d1e
+      size: 5103
+    params:
+      params.yaml:
+        data.features_path: data/interim/features.csv
+        model.opt_params:
+          pbounds:
+            c:
+            - 10
+            - 1000
+            k:
+            - 10
+            - 1000
+            w:
+            - 0
+            - 2
+          n_iter: 20
+          init_points: 20
+          random_state: 1
+        model.start_score: 1500
+    outs:
+    - path: data/interim/modelled_data.csv
+      hash: md5
+      md5: 997940bfaa1d5239e23199378190aa3c
+      size: 2184803

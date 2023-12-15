@@ -7,7 +7,7 @@ plots:
     x: step
 stages:
   preprocess_data:
-    cmd: python src/f1_elo/data.py
+    cmd: make data_preprocessed
     deps:
     - src/f1_elo/data.py
     params:
@@ -16,12 +16,23 @@ stages:
     outs:
     - data/interim/preprocessed_data.csv
   clean_data:
-    cmd: python src/f1_elo/features.py
+    cmd: make data_features
     deps:
+    - data/interim/preprocessed_data.csv
     - src/f1_elo/features.py
     params:
-    - preprocess_data
     - data.preprocessed_path
     - data.status_csv
     outs:
     - data/interim/features.csv
+  create_model:
+    cmd: make data_model
+    deps:
+    - data/interim/features.csv
+    - src/f1_elo/model.py
+    params:
+    - data.features_path
+    - model.start_score
+    - model.opt_params
+    outs:
+    - data/interim/modelled_data.csv
