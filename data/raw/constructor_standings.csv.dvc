@@ -1,0 +1,5 @@
+outs:
+- md5: 433bf3ccca0d585eaa683e6b497e2f0a
+  size: 311126
+  hash: md5
+  path: constructor_standings.csv
