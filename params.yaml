@@ -9,8 +9,9 @@ data:
   modelled_path: 'data/interim/modelled_data.csv'
   gott_path: 'data/processed/gott.csv'
   rank_path: 'data/processed/rank.csv'
+  metrics_path: 'models/metrics.json'
+  params_path: 'models/params.yaml'
   
-
 model:
   opt_params:
     pbounds:

@@ -1,9 +1,9 @@
 import itertools
+import json
 import typing
 import yaml
 
 import bayes_opt
-import dvclive
 import pandas as pd
 
 
@@ -117,25 +117,22 @@ if __name__=="__main__":
         init_points=opt_params["init_points"], 
         n_iter=opt_params["n_iter"]
     )
-    opt_results = optimiser.max
-    opt_k = float(opt_results["params"]["k"])
-    opt_c = float(opt_results["params"]["c"])
-    opt_w = float(opt_results["params"]["w"])
-    opt_rmse = float(-opt_results["target"])
+    results = optimiser.max
+    params_log = {
+    "k": float(results["params"]["k"]),
+    "c": float(results["params"]["c"]),
+    "w": float(results["params"]["w"])
+    }
+    metrics_log = {
+        "RMSE": float(-results["target"])
+    }
 
-    # log experiment outcome
-    with dvclive.Live(exp_name="elo+ava+cs+es-2") as live:
-        live.log_param("k", opt_k)
-        live.log_param("c", opt_c)
-        live.log_param("w", opt_w)
-        live.log_metric("RMSE", opt_rmse)
+    #log metrics and params locally
+    with open(CONFIG["data"]["metrics_path"], "w") as out:
+        json.dump(metrics_log, out)
+
+    with open(CONFIG["data"]["params_path"], "w") as out:
+        yaml.dump(params_log, out)
 
     # create final model data
-    model_data(k=opt_k, c=opt_c, w=opt_w, export=True)
-
-# ELO = standard algo
-# AVA = all vs all
-# CS = constructor scores
-# ES = end statuses
-# CP = constructor penalty
-# RAN = random expected outcome
+    model_data(k=params_log["k"], c=params_log["c"], w=params_log["w"], export=True)

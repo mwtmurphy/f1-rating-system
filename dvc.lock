@@ -45,11 +45,13 @@ stages:
       size: 1206388
     - path: src/f1_elo/model.py
       hash: md5
-      md5: f5674efd42fe9df16a3e65b392708d1e
-      size: 5103
+      md5: 3662d38351c5e7194ce178a6afbe3398
+      size: 4999
     params:
       params.yaml:
         data.features_path: data/interim/features.csv
+        data.metrics_path: models/metrics.json
+        data.params_path: models/params.yaml
         model.opt_params:
           pbounds:
             c:
@@ -70,3 +72,11 @@ stages:
       hash: md5
       md5: 997940bfaa1d5239e23199378190aa3c
       size: 2184803
+    - path: models/metrics.json
+      hash: md5
+      md5: f5eb35b2e86ab575ce12cfd7053f1907
+      size: 29
+    - path: models/params.yaml
+      hash: md5
+      md5: 7fa9105486078d96c04e4959f6b6dae3
+      size: 65

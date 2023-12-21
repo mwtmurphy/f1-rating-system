@@ -1,10 +1,3 @@
-params:
-- dvclive/params.yaml
-metrics:
-- dvclive/metrics.json
-plots:
-- dvclive/plots/metrics:
-    x: step
 stages:
   preprocess_data:
     cmd: make data_preprocessed
@@ -32,7 +25,15 @@ stages:
     - src/f1_elo/model.py
     params:
     - data.features_path
+    - data.metrics_path
+    - data.params_path
     - model.start_score
     - model.opt_params
     outs:
     - data/interim/modelled_data.csv
+    - models/params.yaml:
+        cache: false
+    metrics:
+    - models/metrics.json:
+        cache: false
+
