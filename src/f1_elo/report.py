@@ -1,3 +1,4 @@
+import json
 import yaml
 
 import pandas as pd
@@ -33,9 +34,25 @@ def make_report_data():
     })
     rank_df.index += 1
 
+    # create one-off data points
+    
+    ## get last race completed
+    completed_race_ids = set(pd.read_csv(CONFIG["data"]["results_csv"])["raceId"])
+    races_df = pd.read_csv(CONFIG["data"]["races_csv"])
+    races_df = races_df[races_df["raceId"].isin(completed_race_ids)]
+    latest_race_ser = races_df.loc[races_df["date"] == races_df["date"].max(), ["year", "name"]].iloc[0].tolist()
+    latest_race = f"{latest_race_ser[0]} {latest_race_ser[1]}"
+
+    one_off_dict = {
+        "last_race": latest_race
+    }
+
     # export data
     gott_df.to_csv(CONFIG["data"]["gott_path"], index=False)
     rank_df.to_csv(CONFIG["data"]["rank_path"], index=True)
+    
+    with open(CONFIG["data"]["one_off_path"], "w") as one_off_file:
+        json.dump(one_off_dict, one_off_file)
 
 
 if __name__=="__main__":

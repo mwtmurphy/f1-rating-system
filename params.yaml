@@ -9,6 +9,7 @@ data:
   modelled_path: 'data/interim/modelled_data.csv'
   gott_path: 'data/processed/gott.csv'
   rank_path: 'data/processed/rank.csv'
+  one_off_path: 'data/processed/one_off.json'
   metrics_path: 'models/metrics.json'
   params_path: 'models/params.yaml'
   

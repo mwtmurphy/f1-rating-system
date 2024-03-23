@@ -1,3 +1,4 @@
+import json
 import yaml
 
 import pandas as pd
@@ -19,13 +20,18 @@ def load_data() -> tuple:
     gott_df = pd.read_csv(CONFIG["data"]["gott_path"])
     rank_df = pd.read_csv(CONFIG["data"]["rank_path"], index_col=0)
 
-    return gott_df, rank_df
+    with open(CONFIG["data"]["one_off_path"], "r") as infile:
+        one_off_dict = json.load(infile)
 
-gott_df, rank_df = load_data()
+    return gott_df, rank_df, one_off_dict
+
+gott_df, rank_df, one_off_dict = load_data()
 
 # data vis
 st.markdown(
-"""
+f"""
+*Last updated: {one_off_dict['last_race']}.*
+
 # F1 Elo
 
 The question that has ruined many a social event: 
@@ -35,7 +41,7 @@ The question that has ruined many a social event:
 There are many opinions but let's apply some data science to the problem to see if we can identify 
 the data GOAT.
 
-From 1950 - 2023, I've created Elo scores for every constructor and driver for every race. This 
+From 1950 - 2024, I've created Elo scores for every constructor and driver for every race. This 
 allows me to identify the drivers who were the greatest of their time.
 
 ## Method

@@ -880,13 +880,13 @@ pgp = ["gpg"]
 
 [[package]]
 name = "dvc"
-version = "3.30.1"
+version = "3.32.0"
 description = "Git for data scientists - manage your code and data together"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "dvc-3.30.1-py3-none-any.whl", hash = "sha256:fdfd90f738fd1663fec560c9665600f78aa2636300da8c41fdca4964e28d2c01"},
-    {file = "dvc-3.30.1.tar.gz", hash = "sha256:4048b016b0a0bd08d08fadd889a5e7e2debcda1e891204987a5ccc8ccc4bdc29"},
+    {file = "dvc-3.32.0-py3-none-any.whl", hash = "sha256:1d97c62fb311cb3a4bc526ed595ff6d5e1570b25dcc39baf06bf895436b273ca"},
+    {file = "dvc-3.32.0.tar.gz", hash = "sha256:fe47e88f91d48daa669c34233940b0fa5ce0762e7ccc303f892561bcae6cdf0c"},
 ]
 
 [package.dependencies]
@@ -894,10 +894,10 @@ colorama = ">=0.3.9"
 configobj = ">=5.0.6"
 distro = ">=1.3"
 dpath = ">=2.1.0,<3"
-dvc-data = ">=2.22.0,<2.23.0"
+dvc-data = ">=2.22.1,<2.23.0"
 dvc-http = ">=2.29.0"
 dvc-render = ">=0.3.1,<1"
-dvc-studio-client = ">=0.13.0,<1"
+dvc-studio-client = ">=0.17.1,<1"
 dvc-task = ">=0.3.0,<1"
 flatten-dict = ">=0.4.1,<1"
 "flufl.lock" = ">=5,<8"
@@ -917,7 +917,7 @@ pyparsing = ">=2.4.7"
 requests = ">=2.22"
 rich = ">=12"
 "ruamel.yaml" = ">=0.17.11"
-scmrepo = ">=1.4.1,<2"
+scmrepo = ">=1.5.0,<2"
 shortuuid = ">=0.5"
 shtab = ">=1.3.4,<2"
 tabulate = ">=0.8.7"
@@ -933,26 +933,26 @@ dev = ["dvc[azure,gdrive,gs,hdfs,lint,oss,s3,ssh,tests,webdav,webhdfs]"]
 gdrive = ["dvc-gdrive (==2.20)"]
 gs = ["dvc-gs (==2.22.1)"]
 hdfs = ["dvc-hdfs (==2.19)"]
-lint = ["mypy (==1.7.0)", "types-colorama", "types-psutil", "types-pyinstaller", "types-requests", "types-tabulate", "types-toml", "types-tqdm"]
-oss = ["dvc-oss (>=2.20.0)"]
+lint = ["mypy (==1.7.1)", "pandas-stubs", "types-colorama", "types-psutil", "types-pyinstaller", "types-requests", "types-tabulate", "types-toml", "types-tqdm"]
+oss = ["dvc-oss (>=2.22.0)"]
 s3 = ["dvc-s3 (==2.23.0)"]
 ssh = ["dvc-ssh (>=2.22.1,<3)"]
 ssh-gssapi = ["dvc-ssh[gssapi] (>=2.22.1,<3)"]
-testing = ["pytest-benchmark[histogram]", "pytest-test-utils", "pytest-virtualenv"]
-tests = ["beautifulsoup4 (>=4.4)", "dvc-ssh", "dvc[testing]", "filelock", "flaky", "pytest (>=7,<8)", "pytest-cov (>=4.1.0)", "pytest-docker (>=1,<3)", "pytest-lazy-fixture", "pytest-mock", "pytest-test-utils", "pytest-timeout (>=2)", "pytest-xdist (>=3.2)", "pywin32 (>=225)", "tzdata"]
+testing = ["pytest-benchmark[histogram]", "pytest-test-utils", "virtualenv"]
+tests = ["beautifulsoup4 (>=4.4)", "dbt-sqlite", "dvc-ssh", "dvc[testing]", "filelock", "flaky", "pandas (>=1)", "pytest (>=7,<8)", "pytest-cov (>=4.1.0)", "pytest-docker (>=1,<3)", "pytest-lazy-fixture", "pytest-mock", "pytest-test-utils", "pytest-timeout (>=2)", "pytest-xdist (>=3.2)", "pywin32 (>=225)", "sqlalchemy (>=1,<3)", "tzdata"]
 webdav = ["dvc-webdav (==2.19.1)"]
 webhdfs = ["dvc-webhdfs (==2.19)"]
 webhdfs-kerberos = ["dvc-webhdfs[kerberos] (==2.19)"]
 
 [[package]]
 name = "dvc-data"
-version = "2.22.0"
+version = "2.22.3"
 description = "dvc data"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "dvc-data-2.22.0.tar.gz", hash = "sha256:970f465cd15d0511b9602764617495e515753f8c9dacc3dce955d02f36d0802e"},
-    {file = "dvc_data-2.22.0-py3-none-any.whl", hash = "sha256:fe171c19317930ced76a16caa5e5e0c95e429a809a5a0f454ef05e5d4d003e8e"},
+    {file = "dvc-data-2.22.3.tar.gz", hash = "sha256:ab4b6695078eea95f8289c6cde2d8356cfbff231c8d5b72b29cf34ec2ecf9c26"},
+    {file = "dvc_data-2.22.3-py3-none-any.whl", hash = "sha256:687c62ee3cb42438d8c27081a0c2dc39df5a77957dc44362057bd31f3579284b"},
 ]
 
 [package.dependencies]
@@ -963,31 +963,13 @@ dvc-objects = ">=1.1.0,<2"
 funcy = ">=1.14"
 pygtrie = ">=2.3.2"
 shortuuid = ">=0.5.0"
-sqltrie = ">=0.8.0,<1"
+sqltrie = ">=0.9.0,<1"
 
 [package.extras]
-all = ["rich (>=10.11.0,<14.0.0)", "typer[all] (>=0.6)"]
+all = ["dvc-data[cli]"]
 cli = ["rich (>=10.11.0,<14.0.0)", "typer[all] (>=0.6)"]
-dev = ["blake3 (>=0.3.1)", "mypy (==1.5.1)", "pylint (==2.17.5)", "pytest (==7.2.0)", "pytest-benchmark (==4.0.0)", "pytest-cov (==4.0.0)", "pytest-mock (==3.10.0)", "pytest-servers[s3] (==0.1.3)", "pytest-sugar (==0.9.6)", "rich (>=10.11.0,<14.0.0)", "typer[all] (>=0.6)"]
-tests = ["mypy (==1.5.1)", "pylint (==2.17.5)", "pytest (==7.2.0)", "pytest-benchmark (==4.0.0)", "pytest-cov (==4.0.0)", "pytest-mock (==3.10.0)", "pytest-servers[s3] (==0.1.3)", "pytest-sugar (==0.9.6)"]
-
-[[package]]
-name = "dvc-gdrive"
-version = "3.0.0"
-description = "gdrive plugin for dvc"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "dvc-gdrive-3.0.0.tar.gz", hash = "sha256:9334f9153530eb4ebc9b59ce9738cd592c5506999e4d2372df3dab733d279d96"},
-    {file = "dvc_gdrive-3.0.0-py3-none-any.whl", hash = "sha256:5459afadd9af9dd22d29c0d503082e593d01f2552a551e05d5976c74852679ad"},
-]
-
-[package.dependencies]
-dvc = "*"
-pydrive2 = {version = ">=1.16", extras = ["fsspec"]}
-
-[package.extras]
-tests = ["Pygments (==2.10.0)", "collective.checkdocs (==0.2)", "dvc[testing]", "filelock (==3.3.2)", "flaky (==3.7.0)", "mock (==4.0.3)", "mypy (==0.981)", "pydocstyle (==6.1.1)", "pylint (==2.16.2)", "pylint-plugin-utils (==0.6)", "pylint-pytest (==1.1.2)", "pytest (==6.2.5)", "pytest-cov (==3.0.0)", "pytest-docker (>=1,<2)", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==3.6.1)", "pytest-xdist (==2.4.0)", "pywin32 (>=225)", "types-requests (==2.25.11)", "types-tabulate (==0.8.3)", "types-toml (==0.10.1)", "wget (==3.2)", "wheel (==0.37.0)", "xmltodict (==0.12.0)"]
+dev = ["blake3 (>=0.3.1)", "dvc-data[all]", "dvc-data[tests]"]
+tests = ["mypy (==1.5.1)", "pytest (==7.2.0)", "pytest-benchmark (==4.0.0)", "pytest-cov (==4.0.0)", "pytest-mock (==3.10.0)", "pytest-servers[s3] (==0.1.3)", "pytest-sugar (==0.9.6)"]
 
 [[package]]
 name = "dvc-http"
@@ -1050,13 +1032,13 @@ tests = ["flatten-dict (>=0.4.1,<1)", "funcy (>=1.17)", "matplotlib", "mypy (==0
 
 [[package]]
 name = "dvc-studio-client"
-version = "0.16.1"
+version = "0.20.0"
 description = "Small library to post data from DVC/DVCLive to Iterative Studio"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "dvc-studio-client-0.16.1.tar.gz", hash = "sha256:dd3b93663aaa06ec19e89dc85b2b359e0545a5e27b1431c958a607c378f2027b"},
-    {file = "dvc_studio_client-0.16.1-py3-none-any.whl", hash = "sha256:b0dbffcd05ff021130dacd4e251c0a465e2a311f93dc7c2b3942f7a87c303c85"},
+    {file = "dvc-studio-client-0.20.0.tar.gz", hash = "sha256:a242e9c46297c689d65ff28d439b7c2e7535b641f09860f871b5628f7ae4bc42"},
+    {file = "dvc_studio_client-0.20.0-py3-none-any.whl", hash = "sha256:b9ee7c419a799ecdaeaf872114e6d664be1584822473fdf8aff43c961a3e2aa3"},
 ]
 
 [package.dependencies]
@@ -1065,9 +1047,9 @@ requests = "*"
 voluptuous = "*"
 
 [package.extras]
-dev = ["mkdocs (==1.5.3)", "mkdocs-gen-files (==0.5.0)", "mkdocs-material (==9.4.6)", "mkdocs-section-index (==0.3.8)", "mkdocstrings-python (==1.7.3)", "pytest (==7.4.2)", "pytest-cov (==4.1.0)", "pytest-mock (==3.12.0)", "pytest-sugar (==0.9.7)"]
-docs = ["mkdocs (==1.5.3)", "mkdocs-gen-files (==0.5.0)", "mkdocs-material (==9.4.6)", "mkdocs-section-index (==0.3.8)", "mkdocstrings-python (==1.7.3)"]
-tests = ["pytest (==7.4.2)", "pytest-cov (==4.1.0)", "pytest-mock (==3.12.0)", "pytest-sugar (==0.9.7)"]
+dev = ["dvc-studio-client[docs]", "dvc-studio-client[tests]", "types-requests"]
+docs = ["mkdocs (==1.5.3)", "mkdocs-gen-files (==0.5.0)", "mkdocs-material (==9.5.8)", "mkdocs-section-index (==0.3.8)", "mkdocstrings-python (==1.8.0)"]
+tests = ["mypy (==1.8.0)", "pytest (==8.0.0)", "pytest-cov (==4.1.0)", "pytest-mock (==3.12.0)", "pytest-sugar (==1.0.0)"]
 
 [[package]]
 name = "dvc-task"
@@ -1380,101 +1362,6 @@ gitdb = ">=4.0.1,<5"
 test = ["black", "coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mock", "mypy", "pre-commit", "pytest", "pytest-cov", "pytest-instafail", "pytest-subtests", "pytest-sugar"]
 
 [[package]]
-name = "google-api-core"
-version = "2.15.0"
-description = "Google API client core library"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "google-api-core-2.15.0.tar.gz", hash = "sha256:abc978a72658f14a2df1e5e12532effe40f94f868f6e23d95133bd6abcca35ca"},
-    {file = "google_api_core-2.15.0-py3-none-any.whl", hash = "sha256:2aa56d2be495551e66bbff7f729b790546f87d5c90e74781aa77233bcb395a8a"},
-]
-
-[package.dependencies]
-google-auth = ">=2.14.1,<3.0.dev0"
-googleapis-common-protos = ">=1.56.2,<2.0.dev0"
-protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0.dev0"
-requests = ">=2.18.0,<3.0.0.dev0"
-
-[package.extras]
-grpc = ["grpcio (>=1.33.2,<2.0dev)", "grpcio (>=1.49.1,<2.0dev)", "grpcio-status (>=1.33.2,<2.0.dev0)", "grpcio-status (>=1.49.1,<2.0.dev0)"]
-grpcgcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
-grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
-
-[[package]]
-name = "google-api-python-client"
-version = "2.111.0"
-description = "Google API Client Library for Python"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "google-api-python-client-2.111.0.tar.gz", hash = "sha256:3a45a53c031478d1c82c7162dd25c9a965247bca6bd438af0838a9d9b8219405"},
-    {file = "google_api_python_client-2.111.0-py2.py3-none-any.whl", hash = "sha256:b605adee2d09a843b97a59925757802904679e44e5599708cedb8939900dfbc7"},
-]
-
-[package.dependencies]
-google-api-core = ">=1.31.5,<2.0.dev0 || >2.3.0,<3.0.0.dev0"
-google-auth = ">=1.19.0,<3.0.0.dev0"
-google-auth-httplib2 = ">=0.1.0"
-httplib2 = ">=0.15.0,<1.dev0"
-uritemplate = ">=3.0.1,<5"
-
-[[package]]
-name = "google-auth"
-version = "2.25.2"
-description = "Google Authentication Library"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "google-auth-2.25.2.tar.gz", hash = "sha256:42f707937feb4f5e5a39e6c4f343a17300a459aaf03141457ba505812841cc40"},
-    {file = "google_auth-2.25.2-py2.py3-none-any.whl", hash = "sha256:473a8dfd0135f75bb79d878436e568f2695dce456764bf3a02b6f8c540b1d256"},
-]
-
-[package.dependencies]
-cachetools = ">=2.0.0,<6.0"
-pyasn1-modules = ">=0.2.1"
-rsa = ">=3.1.4,<5"
-
-[package.extras]
-aiohttp = ["aiohttp (>=3.6.2,<4.0.0.dev0)", "requests (>=2.20.0,<3.0.0.dev0)"]
-enterprise-cert = ["cryptography (==36.0.2)", "pyopenssl (==22.0.0)"]
-pyopenssl = ["cryptography (>=38.0.3)", "pyopenssl (>=20.0.0)"]
-reauth = ["pyu2f (>=0.1.5)"]
-requests = ["requests (>=2.20.0,<3.0.0.dev0)"]
-
-[[package]]
-name = "google-auth-httplib2"
-version = "0.2.0"
-description = "Google Authentication Library: httplib2 transport"
-optional = false
-python-versions = "*"
-files = [
-    {file = "google-auth-httplib2-0.2.0.tar.gz", hash = "sha256:38aa7badf48f974f1eb9861794e9c0cb2a0511a4ec0679b1f886d108f5640e05"},
-    {file = "google_auth_httplib2-0.2.0-py2.py3-none-any.whl", hash = "sha256:b65a0a2123300dd71281a7bf6e64d65a0759287df52729bdd1ae2e47dc311a3d"},
-]
-
-[package.dependencies]
-google-auth = "*"
-httplib2 = ">=0.19.0"
-
-[[package]]
-name = "googleapis-common-protos"
-version = "1.62.0"
-description = "Common protobufs used in Google APIs"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "googleapis-common-protos-1.62.0.tar.gz", hash = "sha256:83f0ece9f94e5672cced82f592d2a5edf527a96ed1794f0bab36d5735c996277"},
-    {file = "googleapis_common_protos-1.62.0-py2.py3-none-any.whl", hash = "sha256:4750113612205514f9f6aa4cb00d523a94f3e8c06c5ad2fee466387dc4875f07"},
-]
-
-[package.dependencies]
-protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0.dev0"
-
-[package.extras]
-grpc = ["grpcio (>=1.44.0,<2.0.0.dev0)"]
-
-[[package]]
 name = "grandalf"
 version = "0.8"
 description = "Graph and drawing algorithms framework"
@@ -1515,20 +1402,6 @@ typer = ">=0.4.1"
 
 [package.extras]
 tests = ["freezegun", "pylint (==3.0.2)", "pylint-plugin-utils", "pytest", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock", "pytest-test-utils", "types-freezegun"]
-
-[[package]]
-name = "httplib2"
-version = "0.22.0"
-description = "A comprehensive HTTP client library."
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-files = [
-    {file = "httplib2-0.22.0-py3-none-any.whl", hash = "sha256:14ae0a53c1ba8f3d37e9e27cf37eabb0fb9980f435ba405d546948b009dd64dc"},
-    {file = "httplib2-0.22.0.tar.gz", hash = "sha256:d7a10bc5ef5ab08322488bde8c726eeee5c8618723fdb399597ec58f3d82df81"},
-]
-
-[package.dependencies]
-pyparsing = {version = ">=2.4.2,<3.0.0 || >3.0.0,<3.0.1 || >3.0.1,<3.0.2 || >3.0.2,<3.0.3 || >3.0.3,<4", markers = "python_version > \"3.0\""}
 
 [[package]]
 name = "hydra-core"
@@ -2120,24 +1993,6 @@ files = [
 ]
 
 [[package]]
-name = "oauth2client"
-version = "4.1.3"
-description = "OAuth 2.0 client library"
-optional = false
-python-versions = "*"
-files = [
-    {file = "oauth2client-4.1.3-py2.py3-none-any.whl", hash = "sha256:b8a81cc5d60e2d364f0b1b98f958dbd472887acaf1a5b05e21c28c31a2d6d3ac"},
-    {file = "oauth2client-4.1.3.tar.gz", hash = "sha256:d486741e451287f69568a4d26d70d9acd73a2bbfa275746c535b4209891cccc6"},
-]
-
-[package.dependencies]
-httplib2 = ">=0.9.1"
-pyasn1 = ">=0.1.7"
-pyasn1-modules = ">=0.0.5"
-rsa = ">=3.1.4"
-six = ">=1.6.1"
-
-[[package]]
 name = "omegaconf"
 version = "2.3.0"
 description = "A flexible configuration library"
@@ -2559,31 +2414,6 @@ files = [
 numpy = ">=1.16.6"
 
 [[package]]
-name = "pyasn1"
-version = "0.5.1"
-description = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)"
-optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
-files = [
-    {file = "pyasn1-0.5.1-py2.py3-none-any.whl", hash = "sha256:4439847c58d40b1d0a573d07e3856e95333f1976294494c325775aeca506eb58"},
-    {file = "pyasn1-0.5.1.tar.gz", hash = "sha256:6d391a96e59b23130a5cfa74d6fd7f388dbbe26cc8f1edf39fdddf08d9d6676c"},
-]
-
-[[package]]
-name = "pyasn1-modules"
-version = "0.3.0"
-description = "A collection of ASN.1-based protocols modules"
-optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
-files = [
-    {file = "pyasn1_modules-0.3.0-py2.py3-none-any.whl", hash = "sha256:d3ccd6ed470d9ffbc716be08bd90efbd44d0734bc9303818f7336070984a162d"},
-    {file = "pyasn1_modules-0.3.0.tar.gz", hash = "sha256:5bd01446b736eb9d31512a30d46c1ac3395d676c6f3cafa4c03eb54b9925631c"},
-]
-
-[package.dependencies]
-pyasn1 = ">=0.4.6,<0.6.0"
-
-[[package]]
 name = "pycparser"
 version = "2.21"
 description = "C parser in Python"
@@ -2764,31 +2594,6 @@ files = [
 pyparsing = ">=2.1.4"
 
 [[package]]
-name = "pydrive2"
-version = "1.18.1"
-description = "Google Drive API made easy. Maintained fork of PyDrive."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "PyDrive2-1.18.1-py3-none-any.whl", hash = "sha256:59ad27ecb7b7954ddda340c11266353bf9749092e8d312c9b89b5aa48deff869"},
-    {file = "PyDrive2-1.18.1.tar.gz", hash = "sha256:49dca8842f7c3d63fd35ab55492af2a8b5b39f1cc811042fe37ffbed1c48303f"},
-]
-
-[package.dependencies]
-appdirs = {version = ">=1.4.3", optional = true, markers = "extra == \"fsspec\""}
-fsspec = {version = ">=2021.07.0", optional = true, markers = "extra == \"fsspec\""}
-funcy = {version = ">=1.14", optional = true, markers = "extra == \"fsspec\""}
-google-api-python-client = ">=1.12.5"
-oauth2client = ">=4.0.0"
-pyOpenSSL = ">=19.1.0"
-PyYAML = ">=3.0"
-tqdm = {version = ">=4.0.0", optional = true, markers = "extra == \"fsspec\""}
-
-[package.extras]
-fsspec = ["appdirs (>=1.4.3)", "fsspec (>=2021.07.0)", "funcy (>=1.14)", "tqdm (>=4.0.0)"]
-tests = ["black (==23.12.0)", "flake8", "flake8-docstrings", "funcy (>=1.14)", "importlib-resources (<6)", "pyinstaller", "pytest (>=4.6.0)", "pytest-mock", "timeout-decorator"]
-
-[[package]]
 name = "pygit2"
 version = "1.13.3"
 description = "Python bindings for libgit2."
@@ -2850,24 +2655,6 @@ files = [
     {file = "pygtrie-2.5.0-py3-none-any.whl", hash = "sha256:8795cda8105493d5ae159a5bef313ff13156c5d4d72feddefacaad59f8c8ce16"},
     {file = "pygtrie-2.5.0.tar.gz", hash = "sha256:203514ad826eb403dab1d2e2ddd034e0d1534bbe4dbe0213bb0593f66beba4e2"},
 ]
-
-[[package]]
-name = "pyopenssl"
-version = "23.3.0"
-description = "Python wrapper module around the OpenSSL library"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "pyOpenSSL-23.3.0-py3-none-any.whl", hash = "sha256:6756834481d9ed5470f4a9393455154bc92fe7a64b7bc6ee2c804e78c52099b2"},
-    {file = "pyOpenSSL-23.3.0.tar.gz", hash = "sha256:6b2cba5cc46e822750ec3e5a81ee12819850b11303630d575e98108a079c2b12"},
-]
-
-[package.dependencies]
-cryptography = ">=41.0.5,<42"
-
-[package.extras]
-docs = ["sphinx (!=5.2.0,!=5.2.0.post0,!=7.2.5)", "sphinx-rtd-theme"]
-test = ["flaky", "pretend", "pytest (>=3.0.1)"]
 
 [[package]]
 name = "pyparsing"
@@ -3272,20 +3059,6 @@ files = [
 ]
 
 [[package]]
-name = "rsa"
-version = "4.9"
-description = "Pure-Python RSA implementation"
-optional = false
-python-versions = ">=3.6,<4"
-files = [
-    {file = "rsa-4.9-py3-none-any.whl", hash = "sha256:90260d9058e514786967344d0ef75fa8727eed8a7d2e43ce9f4bcf1b536174f7"},
-    {file = "rsa-4.9.tar.gz", hash = "sha256:e38464a49c6c85d7f1351b0126661487a7e0a14a50f1675ec50eb34d4f20ef21"},
-]
-
-[package.dependencies]
-pyasn1 = ">=0.1.3"
-
-[[package]]
 name = "ruamel-yaml"
 version = "0.18.5"
 description = "ruamel.yaml is a YAML parser/emitter that supports roundtrip preservation of comments, seq/map flow style, and map key order"
@@ -3555,13 +3328,13 @@ files = [
 
 [[package]]
 name = "sqltrie"
-version = "0.8.0"
+version = "0.11.0"
 description = "SQL-based prefix tree inspired by pygtrie and python-diskcache"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "sqltrie-0.8.0-py3-none-any.whl", hash = "sha256:80a708960fd9468b645f527b39ea6beae30e57d5d5dd284f54a49ac267d240eb"},
-    {file = "sqltrie-0.8.0.tar.gz", hash = "sha256:a773e41f00ae9215a79d3e0537526eaf5e37100037a2ef042d09edcc209abc9e"},
+    {file = "sqltrie-0.11.0-py3-none-any.whl", hash = "sha256:132c3d2675dd14970093e2f8dcde906f7a3c900c4477641da71c0c8627eb5a0e"},
+    {file = "sqltrie-0.11.0.tar.gz", hash = "sha256:e613a74843e2b55ce1d20d333100d6a41127a1d6c12f835915f58fbd13944a82"},
 ]
 
 [package.dependencies]
@@ -3570,8 +3343,8 @@ orjson = {version = "*", markers = "implementation_name == \"cpython\""}
 pygtrie = "*"
 
 [package.extras]
-dev = ["mypy (==0.971)", "pyinstaller", "pylint (==2.15.0)", "pytest (==7.2.0)", "pytest-benchmark", "pytest-cov (==3.0.0)", "pytest-mock (==3.8.2)", "pytest-sugar (==0.9.5)"]
-tests = ["mypy (==0.971)", "pyinstaller", "pylint (==2.15.0)", "pytest (==7.2.0)", "pytest-benchmark", "pytest-cov (==3.0.0)", "pytest-mock (==3.8.2)", "pytest-sugar (==0.9.5)"]
+dev = ["sqltrie[tests]"]
+tests = ["mypy (==0.971)", "pyinstaller", "pytest (==7.2.0)", "pytest-benchmark", "pytest-cov (==3.0.0)", "pytest-mock (==3.8.2)", "pytest-sugar (==0.9.5)"]
 
 [[package]]
 name = "stack-data"
@@ -3817,17 +3590,6 @@ tzdata = {version = "*", markers = "platform_system == \"Windows\""}
 
 [package.extras]
 devenv = ["check-manifest", "pytest (>=4.3)", "pytest-cov", "pytest-mock (>=3.3)", "zest.releaser"]
-
-[[package]]
-name = "uritemplate"
-version = "4.1.1"
-description = "Implementation of RFC 6570 URI Templates"
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "uritemplate-4.1.1-py2.py3-none-any.whl", hash = "sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e"},
-    {file = "uritemplate-4.1.1.tar.gz", hash = "sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0"},
-]
 
 [[package]]
 name = "urllib3"
@@ -4077,4 +3839,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.*"
-content-hash = "fbf198595cb57b80bc7b885dc74f332e281184b71e2086279e07070a6ab03d56"
+content-hash = "f5050ccabd9b4ae18f66ada42e5fd8b107712cd0be882b0bca0ffd8b6f847848"

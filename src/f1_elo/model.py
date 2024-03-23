@@ -119,9 +119,9 @@ if __name__=="__main__":
     )
     results = optimiser.max
     params_log = {
-    "k": float(results["params"]["k"]),
-    "c": float(results["params"]["c"]),
-    "w": float(results["params"]["w"])
+        "k": float(results["params"]["k"]),
+        "c": float(results["params"]["c"]),
+        "w": float(results["params"]["w"])
     }
     metrics_log = {
         "RMSE": float(-results["target"])

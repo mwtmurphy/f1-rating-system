@@ -26,7 +26,7 @@ There are many opinions. Is it Fangio, Senna, Michael Schumacher, Hamilton. Let'
 
 ### Prerequisites
 
-This project is built using Make, Python 3.10.12 and Poetry 1.5.0. Install these dependencies before continuing.
+This project is built using Make, Python 3.10.12 and Poetry 1.7.1. Install these dependencies before continuing.
 
 ### Data 
 
@@ -62,11 +62,12 @@ Hat tip to my dad for annoying a family friend at a recent birthday party to giv
 
 ## Ideas
 
-1. Add sprint races.
-2. Add DNFs and type of DNFs (e.g. crashes = penalty, mechanical failures = no penalty).
-3. Add weighting dependent on constructors finishing position for year (e.g. expected points - realised points).
-4. Add distance apart for finishers (points scored for 25s diff > points scored for 5s).
-5. Scale initial Elo score dependent on racing history pre-F1.
+- Add constructor lineage (i.e. new team first race start score = previous team last race end score).
+- Add DNFs and type of DNFs (e.g. crashes = penalty, mechanical failures = no penalty).
+- Add sprint races.
+- Add weighting dependent on constructors finishing position for year (e.g. expected points - realised points).
+- Add distance apart for finishers (points scored for 25s diff > points scored for 5s).
+- Scale initial Elo score dependent on racing history pre-F1.
 
 [^1]: [CSV DB table download](https://ergast.com/mrd/db/#csv) (last accessed 16/11/23)
 [^2]: [CSV DB table structure](https://ergast.com/docs/f1db_user_guide.txt) (last accessed 16/11/23)
