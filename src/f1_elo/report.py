@@ -34,6 +34,9 @@ def make_report_data():
     })
     rank_df.index += 1
 
+    # get outcomes for 2024 
+    df_24 = vis_df[vis_df["year"] == 2024]
+
     # create one-off data points
     
     ## get last race completed
@@ -50,6 +53,7 @@ def make_report_data():
     # export data
     gott_df.to_csv(CONFIG["data"]["gott_path"], index=False)
     rank_df.to_csv(CONFIG["data"]["rank_path"], index=True)
+    df_24.to_csv(CONFIG["data"]["2024_path"], index=False)
     
     with open(CONFIG["data"]["one_off_path"], "w") as one_off_file:
         json.dump(one_off_dict, one_off_file)

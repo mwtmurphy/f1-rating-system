@@ -19,13 +19,14 @@ def load_data() -> tuple:
     
     gott_df = pd.read_csv(CONFIG["data"]["gott_path"])
     rank_df = pd.read_csv(CONFIG["data"]["rank_path"], index_col=0)
+    curr_df = pd.read_csv(CONFIG["data"]["2024_path"])
 
     with open(CONFIG["data"]["one_off_path"], "r") as infile:
         one_off_dict = json.load(infile)
 
-    return gott_df, rank_df, one_off_dict
+    return gott_df, rank_df, curr_df, one_off_dict
 
-gott_df, rank_df, one_off_dict = load_data()
+gott_df, rank_df, curr_df, one_off_dict = load_data()
 
 # data vis
 st.markdown(
@@ -64,6 +65,27 @@ Here's a count of the races the top 10 ranked as highest rated driver:
 )
 
 st.table(rank_df)
+
+st.markdown(
+f"""
+## Bonus
+
+Explore the 2024 expected vs actual results so far:
+"""
+)
+
+round_selected = st.selectbox("2024 round", options=[1, 2])
+sub_df = curr_df.loc[curr_df["round"] == round_selected, ["driverName", "status", "mapPosition", "expected", "actual"]]
+sub_df.columns = ["Driver name", "Race finish status", "Finishing position", "Expected score", "Actual score"]
+sub_df["Score outperformance"] = sub_df["Actual score"] - sub_df["Expected score"]
+sub_df = sub_df.set_index("Finishing position").sort_values("Score outperformance", ascending=False)
+curr_table = st.table(sub_df)
+
+avg_df = curr_df.groupby("driverName")[["expected", "actual"]].sum().reset_index()
+avg_df["Score outperformance"] = avg_df["actual"] - avg_df["expected"]
+avg_df = avg_df.sort_values("Score outperformance", ascending=False)
+avg_table = st.table(avg_df)
+
 
 st.markdown(
 f"""

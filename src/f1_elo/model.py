@@ -20,6 +20,7 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
     dri_scores = {id: CONFIG["model"]["start_score"] for id in set(cle_df["driverId"])}
     con_scores = {id: CONFIG["model"]["start_score"] for id in set(cle_df["constructorId"])}
     cle_df[["constructorScore", "driverScore"]] = None
+    cle_df[["expected", "actual"]] = 0.0
     exp, out = [], []
 
     yr_df = cle_df[["year", "round"]].drop_duplicates()
@@ -63,6 +64,12 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
             # calculate score change and update round scores
             diff_a = k * (o_a - e_a)
             diff_b = k * (o_b - e_b)
+
+            cle_df.loc[ix_1, "expected"] += e_a
+            cle_df.loc[ix_1, "actual"] += o_a
+            cle_df.loc[ix_2, "expected"] += e_b
+            cle_df.loc[ix_2, "actual"] += o_b
+            
 
             rnd_con_scores[con_a]["diff"] += diff_a
             rnd_con_scores[con_a]["n"] += 1
