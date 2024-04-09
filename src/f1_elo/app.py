@@ -74,7 +74,7 @@ Explore the 2024 expected vs actual results so far:
 """
 )
 
-round_selected = st.selectbox("2024 round", options=[1, 2])
+round_selected = st.selectbox("2024 round", options=[1, 2, 3, 4])
 sub_df = curr_df.loc[curr_df["round"] == round_selected, ["driverName", "status", "mapPosition", "expected", "actual"]]
 sub_df.columns = ["Driver name", "Race finish status", "Finishing position", "Expected score", "Actual score"]
 sub_df["Score outperformance"] = sub_df["Actual score"] - sub_df["Expected score"]
