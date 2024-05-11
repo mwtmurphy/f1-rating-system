@@ -48,7 +48,7 @@ greater increase than a win over a lower-ranked driver-constructor paring.
 
 ## Results
 
-Taking the driver who ranks the higest per round, a simple count of races can be done as an estimate
+Taking the driver who ranks the higest per round, a count of races can be done as a basic estimate
 of the data GOAT... drumroll... who is... {rank_df["Driver name"].iloc[0]}! Cue disagreement.
 
 Here's how the top 10 performed over time:
@@ -68,18 +68,42 @@ st.table(rank_df)
 
 st.markdown(
 f"""
-## Bonus
+## 2024 performance
 
-Explore the 2024 expected vs actual results so far:
+Explore the 2024 expected vs actual results so far. 
+
+Driver outperformance is calculated as the sum of the actual - expected scores for each driver. This
+allows us to see how they perform across rounds versus competitors.
+
+
+### Driver performance
 """
 )
 
-round_selected = st.selectbox("2024 round", options=[1, 2, 3, 4])
+dri_selected = st.selectbox("2024 driver", options=sorted(set(curr_df["driverName"])))
+dri_24_df = curr_df.loc[curr_df["driverName"] == dri_selected, ["round", "status", "expected", "actual"]]
+dri_24_df["outperformance"] = dri_24_df["actual"] - dri_24_df["expected"]
+dri_bar = st.bar_chart(dri_24_df, x="round", y="outperformance")
+dri_table = st.table(dri_24_df.set_index("round"))
+
+st.markdown(
+f"""
+### Round performance
+"""
+)
+
+round_selected = st.selectbox("2024 round", options=sorted(set(curr_df["round"])))
 sub_df = curr_df.loc[curr_df["round"] == round_selected, ["driverName", "status", "mapPosition", "expected", "actual"]]
 sub_df.columns = ["Driver name", "Race finish status", "Finishing position", "Expected score", "Actual score"]
 sub_df["Score outperformance"] = sub_df["Actual score"] - sub_df["Expected score"]
 sub_df = sub_df.set_index("Finishing position").sort_values("Score outperformance", ascending=False)
-curr_table = st.table(sub_df)
+round_table = st.table(sub_df)
+
+st.markdown(
+f"""
+### Year performance
+"""
+)
 
 avg_df = curr_df.groupby("driverName")[["expected", "actual"]].sum().reset_index()
 avg_df["Score outperformance"] = avg_df["actual"] - avg_df["expected"]
