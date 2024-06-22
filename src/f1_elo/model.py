@@ -30,7 +30,7 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
     exp, out = [], []
 
     for start_ix, end_ix in IX_CHUNKS:
-        yr_mat = MOD_MAT[start_ix:end_ix]
+        yr_mat = MOD_MAT[start_ix:end_ix+1]
         rnd_dri_scores = {dri: {"diff": 0, "n": 0, "exp": 0, "act": 0} for dri in yr_mat[:, 4]}
         rnd_con_scores = {con: {"diff": 0, "n": 0, "exp": 0, "act": 0} for con in yr_mat[:, 3]}
 
@@ -71,16 +71,17 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
                 rnd_dri_scores[dri_a]["act"] += o_a
                 rnd_dri_scores[dri_a]["diff"] += diff_a
                 rnd_dri_scores[dri_a]["n"] += 1
-            
-                rnd_dri_scores[dri_b]["exp"] += e_a
-                rnd_dri_scores[dri_b]["act"] += o_a
+
+                rnd_dri_scores[dri_b]["exp"] += e_b
+                rnd_dri_scores[dri_b]["act"] += o_b
                 rnd_dri_scores[dri_b]["diff"] += diff_b
                 rnd_dri_scores[dri_b]["n"] += 1
             
             # log constructor changes if diff constructors and neither driver retires due to driver error (not attributable to constructors)
-            if con_a != con_b and "driver_retirement" not in [st_a, st_b]:
+            if con_a != con_b and "driver retirement" not in [st_a, st_b]:
                 rnd_con_scores[con_a]["diff"] += diff_a
                 rnd_con_scores[con_a]["n"] += 1
+    
                 rnd_con_scores[con_b]["diff"] += diff_b
                 rnd_con_scores[con_b]["n"] += 1
                 
