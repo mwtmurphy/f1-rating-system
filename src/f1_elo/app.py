@@ -28,95 +28,98 @@ def load_data() -> tuple:
 
 gott_df, rank_df, curr_df, one_off_dict = load_data()
 
-# data vis
-st.markdown(
-f"""
+# data visualisations
+st.markdown("# How do the current drivers and teams rank?")
+st.bar_chart
 
-# Who is the F1 greatest of all time?
+# st.markdown(
+# f"""
 
-A question that has ruined many a social event. There are many opinions but let's see what the data 
-has to say. From the first race in 1950 to the {one_off_dict['last_race']}, I've created a modified 
-version of the Elo rating system (used in chess) to score both drivers and constructors separately 
-to identify who is the F1 greatest of all time (GOAT).
+# # Who is the F1 greatest of all time?
 
-## Method
+# A question that has ruined many a social event. There are many opinions but let's see what the data 
+# has to say. From the first race in 1950 to the {one_off_dict['last_race']}, I've created a modified 
+# version of the Elo rating system (used in chess) to score both drivers and constructors separately 
+# to identify who is the F1 greatest of all time (GOAT).
 
-All drivers and constructors start with a score of 1500. Each win or loss vs a competitor increases 
-or decreases the scores of both the driver and constructor over time, the size of which is dependent 
-on the expected vs true outcome. I.e. a win over a higher-ranked driver-constructor pairing yields a 
-greater increase than a win over a lower-ranked driver-constructor paring.
+# ## Method
 
-## Results
+# All drivers and constructors start with a score of 1500. Each win or loss vs a competitor increases 
+# or decreases the scores of both the driver and constructor over time, the size of which is dependent 
+# on the expected vs true outcome. I.e. a win over a higher-ranked driver-constructor pairing yields a 
+# greater increase than a win over a lower-ranked driver-constructor paring.
 
-Taking the driver who ranks the higest per round, a count of races can be done as a basic estimate
-of the data GOAT... drumroll... who is... {rank_df["Driver name"].iloc[0]}! Cue disagreement.
+# ## Results
 
-Here's how the top 10 performed over time:
-"""
-)
+# Taking the driver who ranks the higest per round, a count of races can be done as a basic estimate
+# of the data GOAT... drumroll... who is... {rank_df["Driver name"].iloc[0]}! Cue disagreement.
 
-fig = px.line(gott_df, x="date", y="driverScore", color="driverName")
-st.plotly_chart(fig, use_container_width=True)
+# Here's how the top 10 performed over time:
+# """
+# )
 
-st.markdown(
-f"""
-Here's a count of the races the top 10 ranked as highest rated driver:
-"""
-)
+# fig = px.line(gott_df, x="date", y="driverScore", color="driverName")
+# st.plotly_chart(fig, use_container_width=True)
 
-st.table(rank_df)
+# st.markdown(
+# f"""
+# Here's a count of the races the top 10 ranked as highest rated driver:
+# """
+# )
 
-st.markdown(
-f"""
-## 2024 performance
+# st.table(rank_df)
 
-Explore the 2024 expected vs actual results so far. 
+# st.markdown(
+# f"""
+# ## 2024 performance
 
-Driver outperformance is calculated as the sum of the actual - expected scores for each driver. This
-allows us to see how they perform across rounds versus competitors.
+# Explore the 2024 expected vs actual results so far. 
 
-
-### Driver performance
-"""
-)
-
-dri_selected = st.selectbox("2024 driver", options=sorted(set(curr_df["driverName"])))
-dri_24_df = curr_df.loc[curr_df["driverName"] == dri_selected, ["round", "status", "expected", "actual"]]
-dri_24_df["outperformance"] = dri_24_df["actual"] - dri_24_df["expected"]
-dri_bar = st.bar_chart(dri_24_df, x="round", y="outperformance")
-dri_table = st.table(dri_24_df.set_index("round"))
-
-st.markdown(
-f"""
-### Round performance
-"""
-)
-
-round_selected = st.selectbox("2024 round", options=sorted(set(curr_df["round"])))
-sub_df = curr_df.loc[curr_df["round"] == round_selected, ["driverName", "status", "mapPosition", "expected", "actual"]]
-sub_df.columns = ["Driver name", "Race finish status", "Finishing position", "Expected score", "Actual score"]
-sub_df["Score outperformance"] = sub_df["Actual score"] - sub_df["Expected score"]
-sub_df = sub_df.set_index("Finishing position").sort_values("Score outperformance", ascending=False)
-round_table = st.table(sub_df)
-
-st.markdown(
-f"""
-### Year performance
-"""
-)
-
-avg_df = curr_df.groupby("driverName")[["expected", "actual"]].sum().reset_index()
-avg_df["Score outperformance"] = avg_df["actual"] - avg_df["expected"]
-avg_df = avg_df.sort_values("Score outperformance", ascending=False)
-avg_table = st.table(avg_df)
+# Driver outperformance is calculated as the sum of the actual - expected scores for each driver. This
+# allows us to see how they perform across rounds versus competitors.
 
 
-st.markdown(
-f"""
-## Limitations (non-exhaustive)
+# ### Driver performance
+# """
+# )
 
-1. New drivers join the sport with different skill levels, so shouldn't all start at 1500.
-2. New constructors can be rebranded or bought old constructors and should use their score vs starting
-again at 1500.
-"""
-)
+# dri_selected = st.selectbox("2024 driver", options=sorted(set(curr_df["driverName"])))
+# dri_24_df = curr_df.loc[curr_df["driverName"] == dri_selected, ["round", "status", "expected", "actual"]]
+# dri_24_df["outperformance"] = dri_24_df["actual"] - dri_24_df["expected"]
+# dri_bar = st.bar_chart(dri_24_df, x="round", y="outperformance")
+# dri_table = st.table(dri_24_df.set_index("round"))
+
+# st.markdown(
+# f"""
+# ### Round performance
+# """
+# )
+
+# round_selected = st.selectbox("2024 round", options=sorted(set(curr_df["round"])))
+# sub_df = curr_df.loc[curr_df["round"] == round_selected, ["driverName", "status", "mapPosition", "expected", "actual"]]
+# sub_df.columns = ["Driver name", "Race finish status", "Finishing position", "Expected score", "Actual score"]
+# sub_df["Score outperformance"] = sub_df["Actual score"] - sub_df["Expected score"]
+# sub_df = sub_df.set_index("Finishing position").sort_values("Score outperformance", ascending=False)
+# round_table = st.table(sub_df)
+
+# st.markdown(
+# f"""
+# ### Year performance
+# """
+# )
+
+# avg_df = curr_df.groupby("driverName")[["expected", "actual"]].sum().reset_index()
+# avg_df["Score outperformance"] = avg_df["actual"] - avg_df["expected"]
+# avg_df = avg_df.sort_values("Score outperformance", ascending=False)
+# avg_table = st.table(avg_df)
+
+
+# st.markdown(
+# f"""
+# ## Limitations (non-exhaustive)
+
+# 1. New drivers join the sport with different skill levels, so shouldn't all start at 1500.
+# 2. New constructors can be rebranded or bought old constructors and should use their score vs starting
+# again at 1500.
+# """
+# )
