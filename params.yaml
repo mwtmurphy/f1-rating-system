@@ -7,12 +7,13 @@ data:
   preprocessed_path: 'data/interim/preprocessed_data.csv'
   features_path: 'data/interim/features.csv'
   modelled_path: 'data/interim/modelled_data.csv'
-  gott_path: 'data/processed/gott.csv'
-  rank_path: 'data/processed/rank.csv'
+  goat_path: 'data/processed/goat.csv'
+  hist_path: 'data/processed/hist.csv'
   2024_path: 'data/processed/2024.csv'
   one_off_path: 'data/processed/one_off.json'
   metrics_path: 'models/metrics.json'
   params_path: 'models/params.yaml'
+  colour_path: 'data/processed/con_colours.csv'
   
 model:
   opt_params:

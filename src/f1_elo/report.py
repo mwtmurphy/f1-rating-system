@@ -17,27 +17,25 @@ def make_report_data():
     drivers_df["driverName"] = drivers_df[["forename", "surname"]].apply(lambda row: " ".join(row), axis=1)
     vis_df = mod_df.merge(drivers_df[["driverId", "driverName"]], on=["driverId"], how="left")
 
-    # get drivers to be considered
-    gott_df = vis_df.sort_values(["year", "round", "driverScore"], ascending=[True, True, False]).drop_duplicates(["year", "round"])
-    gott_days = gott_df["driverId"].value_counts().iloc[:10]
-    gott_drivers = set(gott_days.index)
-    
-    # create data to visualise greatest drivers over time
-    gott_df = vis_df[vis_df["driverId"].isin(gott_drivers)].sort_values(["year", "round"])
+    con_df = pd.read_csv(CONFIG["data"]["constructors_csv"])[["constructorId", "name"]]
+    con_df = con_df.rename(columns={"name": "constructorName"})
+    vis_df = vis_df.merge(con_df, on="constructorId", how="left")
 
-    # create data for top ranked table
-    rank_df = gott_days.reset_index()
-    rank_df = rank_df.merge(drivers_df[["driverId", "driverName"]], on=["driverId"], how="left")
-    rank_df = rank_df[["driverName", "count"]].rename(columns={
-        "driverName": "Driver name",
-        "count": "Races as top ranked"
-    })
-    rank_df.index += 1
+    # get drivers to be considered
+    vis_df["outperformance"] = vis_df["actual"] - vis_df["expected"]
+    out_df = vis_df.groupby("driverId")["outperformance"].mean().reset_index().rename(columns={"outperformance": "meanOutperformance"})
+    count_df = vis_df.groupby("driverId").size().reset_index().rename(columns={0: "races"})
+    max_df = vis_df.groupby("driverId")["driverScore"].max().reset_index().rename(columns={"driverScore": "maxScore"})
+
+    agg_df = vis_df.groupby(["driverId", "driverName"])["driverScore"].mean().reset_index().rename(columns={"driverScore": "meanScore"})
+    agg_df = agg_df.merge(out_df, on="driverId", how="left").merge(count_df, on="driverId", how="left").merge(max_df, on="driverId", how="left")
+    agg_df = agg_df[["driverId", "driverName", "races", "meanScore", "meanOutperformance", "maxScore"]]
+
+    goat_df = agg_df#.sort_values("meanScore", ascending=False).head(20).reset_index(drop=True)
+    #hist_df = vis_df[vis_df["driverId"].isin(goat_df["driverId"])]
 
     # get outcomes for 2024 
     df_24 = vis_df[vis_df["year"] == 2024]
-
-    # create one-off data points
     
     ## get last race completed
     completed_race_ids = set(pd.read_csv(CONFIG["data"]["results_csv"])["raceId"])
@@ -51,8 +49,8 @@ def make_report_data():
     }
 
     # export data
-    gott_df.to_csv(CONFIG["data"]["gott_path"], index=False)
-    rank_df.to_csv(CONFIG["data"]["rank_path"], index=True)
+    goat_df.to_csv(CONFIG["data"]["goat_path"], index=False)
+    #hist_df.to_csv(CONFIG["data"]["hist_path"], index=True)
     df_24.to_csv(CONFIG["data"]["2024_path"], index=False)
     
     with open(CONFIG["data"]["one_off_path"], "w") as one_off_file:
