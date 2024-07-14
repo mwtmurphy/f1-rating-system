@@ -34,7 +34,7 @@ st.markdown("# Current constructor ratings")
 
 chart = at.Chart(curr_df).encode(
     y=at.Y("constructorName", sort=None, title="Constructor name"),
-    x=at.X("constructorScore", title="Constructor rating"),
+    x=at.X("constructorScore", stack=None, title="Constructor rating", scale=at.Scale(zero=False)),
     tooltip=[
         at.Tooltip("constructorName", title="Constructor name"),
         at.Tooltip("constructorScore:Q", format=".0f", title="Constructor score")

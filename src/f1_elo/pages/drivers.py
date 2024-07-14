@@ -34,7 +34,7 @@ st.markdown("# Current driver ratings")
 
 chart = at.Chart(curr_df).encode(
     y=at.Y("driverName", sort=None, title="Driver name"),
-    x=at.X("driverScore", title="Driver rating"),
+    x=at.X("driverScore", stack=None, title="Driver rating", scale=at.Scale(zero=False)),
     tooltip=[
         at.Tooltip("driverName", title="Driver name"),
         at.Tooltip("driverScore:Q", format=".0f", title="Driver score")

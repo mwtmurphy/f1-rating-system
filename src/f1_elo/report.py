@@ -31,8 +31,8 @@ def make_report_data():
     agg_df = agg_df.merge(out_df, on="driverId", how="left").merge(count_df, on="driverId", how="left").merge(max_df, on="driverId", how="left")
     agg_df = agg_df[["driverId", "driverName", "races", "meanScore", "meanOutperformance", "maxScore"]]
 
-    goat_df = agg_df#.sort_values("meanScore", ascending=False).head(20).reset_index(drop=True)
-    #hist_df = vis_df[vis_df["driverId"].isin(goat_df["driverId"])]
+    goat_df = agg_df
+    hist_df = vis_df
 
     # get outcomes for 2024 
     df_24 = vis_df[vis_df["year"] == 2024]
@@ -50,7 +50,7 @@ def make_report_data():
 
     # export data
     goat_df.to_csv(CONFIG["data"]["goat_path"], index=False)
-    #hist_df.to_csv(CONFIG["data"]["hist_path"], index=True)
+    hist_df.to_csv(CONFIG["data"]["hist_path"], index=True)
     df_24.to_csv(CONFIG["data"]["2024_path"], index=False)
     
     with open(CONFIG["data"]["one_off_path"], "w") as one_off_file:

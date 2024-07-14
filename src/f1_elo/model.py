@@ -31,6 +31,8 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
 
     for start_ix, end_ix in IX_CHUNKS:
         yr_mat = MOD_MAT[start_ix:end_ix+1]
+        n_rnds = yr_mat[-1, 1]
+
         rnd_dri_scores = {dri: {"diff": 0, "n": 0, "exp": 0, "act": 0} for dri in yr_mat[:, 4]}
         rnd_con_scores = {con: {"diff": 0, "n": 0, "exp": 0, "act": 0} for con in yr_mat[:, 3]}
 
@@ -46,14 +48,11 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
             elo_a = dri_scores[dri_a] + (w * con_scores[con_a])
             elo_b = dri_scores[dri_b] + (w * con_scores[con_b])
             
-            # calculate position influence
-            q_a = 10 ** (elo_a / c)
-            q_b = 10 ** (elo_b / c)
-    
-            e_a = q_a / (q_a + q_b)        
-            e_b = q_b / (q_a + q_b)
+            # create expected scores
+            e_a = 1 / (1 + np.exp(-(elo_a - elo_b) / c))
+            e_b = 1 - e_a
 
-            # score outcome
+            # create true scores
             if pos_a < pos_b:
                 o_a = 1
                 o_b = 0
@@ -92,7 +91,7 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
         # update driver values for finishing drivers and driver-caused retirements
         for dri in rnd_dri_scores.keys():
             if rnd_dri_scores[dri]["n"] != 0: # more than 1 car on grid
-                dri_scores[dri] += (rnd_dri_scores[dri]["diff"] / rnd_dri_scores[dri]["n"])
+                dri_scores[dri] += ((1 / (1 + w)) * rnd_dri_scores[dri]["diff"] / rnd_dri_scores[dri]["n"])
                 
         yr_mat[:, 9] = list(map(lambda el: dri_scores[el], yr_mat[:, 4])) # driver score
         yr_mat[:, 10] = list(map(lambda el: rnd_dri_scores[el]["exp"], yr_mat[:, 4])) # expected outcome
@@ -101,7 +100,7 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
         # update constructor values for finishing drivers
         for con in rnd_con_scores.keys():
             if rnd_con_scores[con]["n"] != 0: # more than 1 car on grid
-                con_scores[con] += (rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
+                con_scores[con] += ((w / (1 + w)) * rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
         
         yr_mat[:, 8] = list(map(lambda el: con_scores[el], yr_mat[:, 3]))
 
