@@ -4,6 +4,8 @@ import yaml
 import altair as at
 import pandas as pd
 import streamlit as st
+import streamlit_theme
+
 
 # app config
 st.set_page_config(layout="wide")
@@ -25,6 +27,7 @@ def load_data() -> tuple:
 
     return goat_df, hist_df, one_off_dict
 
+theme = streamlit_theme.st_theme()
 goat_df, hist_df, one_off_dict = load_data()
 
 avg_score_df = goat_df.sort_values("meanScore", ascending=False).head(10).reset_index(drop=True)
@@ -49,7 +52,7 @@ bars = chart.mark_bar(size=30).encode(
     color=at.Color("hex_code:N", scale=None)
 )
 
-text = chart.mark_text(color="black", align="left", dx=2).encode(
+text = chart.mark_text(color=theme["textColor"], align="left", dx=2).encode(
     text=at.Text("meanScore:Q", format=".0f")
 )
 
@@ -96,7 +99,7 @@ bars = chart.mark_bar(size=30).encode(
     color=at.Color("hex_code:N", scale=None)
 )
 
-text = chart.mark_text(color="black", align="left", dx=2).encode(
+text = chart.mark_text(color=theme["textColor"], align="left", dx=2).encode(
     text=at.Text("meanOutperformance:Q", format=".2f")
 )
 

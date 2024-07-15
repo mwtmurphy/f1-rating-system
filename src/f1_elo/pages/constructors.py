@@ -4,6 +4,7 @@ import yaml
 import altair as at
 import pandas as pd
 import streamlit as st
+import streamlit_theme
 
 
 # load current driver data
@@ -24,6 +25,7 @@ def load_data() -> tuple:
 
     return con_df, one_off_dict, col_df
 
+theme = streamlit_theme.st_theme()
 con_df, one_off_dict, col_df = load_data()
 curr_df = con_df.loc[con_df["round"] == con_df["round"].max(), ["constructorId", "constructorName", "constructorScore"]].drop_duplicates().sort_values("constructorScore", ascending=False).reset_index(drop=True)
 curr_df = curr_df.merge(col_df, how="left", on="constructorId")
@@ -45,7 +47,7 @@ bars = chart.mark_bar(size=30).encode(
     color=at.Color("hex_code:N", scale=None)
 )
 
-text = chart.mark_text(color="black", align="left", dx=2).encode(
+text = chart.mark_text(color=theme["textColor"], align="left", dx=2).encode(
     text=at.Text("constructorScore:Q", format=".0f")
 )
 
