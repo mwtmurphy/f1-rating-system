@@ -74,7 +74,11 @@ bars = chart.mark_bar(size=30).encode(
     color=at.Color("hex_code:N", scale=None)
 )
 
-text = chart.mark_text(color=theme["textColor"], align="center", dx=at.expr(at.expr.if_(at.datum.driScoreChange >= 0, 10, -13))).encode(
+text = chart.mark_text(
+    color=theme["textColor"], 
+    align=at.expr(at.expr.if_(at.datum.driScoreChange >= 0, "left", "right")), 
+    dx=at.expr(at.expr.if_(at.datum.driScoreChange >= 0, 2, -2))
+).encode(
     text=at.Text("driScoreChange:Q", format=".0f"),
 )
 
