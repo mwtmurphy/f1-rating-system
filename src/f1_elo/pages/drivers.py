@@ -29,9 +29,10 @@ dri_df, one_off_dict, col_df = load_data()
 curr_df = dri_df.loc[dri_df["round"] == dri_df["round"].max(), ["constructorId", "driverName", "driverScore"]].sort_values("driverScore", ascending=False).reset_index(drop=True)
 curr_df = curr_df.merge(col_df, how="left", on="constructorId")
 
+# create current top-rated driver vis
 st.info(f"Results as of: {one_off_dict['last_race']}")
 
-st.markdown("# Current driver ratings")
+st.markdown(f"# {curr_df.loc[0, 'driverName']} is the current top-rated driver")
 
 chart = at.Chart(curr_df).encode(
     y=at.Y("driverName", sort=None, title="Driver name"),
@@ -52,31 +53,29 @@ text = chart.mark_text(color=theme["textColor"], align="left", dx=2).encode(
 
 st.altair_chart(bars + text, use_container_width=True)
 
-# st.markdown("# Driver performance")
+# create most improved driver vis
+agg_df = dri_df.groupby(["constructorId", "driverId", "driverName"])["driScoreChange"].sum().reset_index()
+agg_df = agg_df.merge(col_df, how="left", on="constructorId").sort_values("driScoreChange", ascending=False).reset_index(drop=True)
+agg_df["baseline"] = 0
 
-# agg_df = dri_df.groupby(["constructorId", "driverId", "driverName"])["outperformance"].sum().reset_index()
-# agg_df = agg_df.merge(col_df, how="left", on="constructorId").sort_values("outperformance", ascending=False)
-# agg_df["baseline"] = 0
+st.markdown(f"# {agg_df.loc[0, 'driverName']} is the most improved driver in 2024")
 
-# chart = at.Chart(agg_df).encode(
-#     y=at.Y("driverName", sort=None, title="Driver name"),
-#     x=at.X("outperformance", stack=None, title="Driver outperformance", scale=at.Scale(zero=False)),
-#     x2="baseline",
-#     tooltip=[
-#         at.Tooltip("driverName", title="Driver name"),
-#         at.Tooltip("outperformance:Q", format=".2f", title="Driver outperformance")
-#     ]
-# ).properties(height=800)
+chart = at.Chart(agg_df).encode(
+    y=at.Y("driverName", sort=None, title="Driver name"),
+    x=at.X("driScoreChange", stack=None, title="Driver rating change", scale=at.Scale(zero=False)),
+    x2="baseline",
+    tooltip=[
+        at.Tooltip("driverName", title="Driver name"),
+        at.Tooltip("driScoreChange:Q", format=".0f", title="Driver rating change")
+    ]
+).properties(height=800)
 
-# bars = chart.mark_bar(size=30).encode(
-#     color=at.Color("hex_code:N", scale=None)
-# )
+bars = chart.mark_bar(size=30).encode(
+    color=at.Color("hex_code:N", scale=None)
+)
 
-# align_condition = at.condition("datum.outperformance > 0", at.value('left'), at.value('right'))
-# dx_condition = at.condition("datum.outperformance > 0", at.value(2), at.value(-2))
-# text = chart.mark_text(color=theme["textColor"], align="left", dx=2).encode(
-#     text=at.Text("outperformance:Q", format=".2f"), 
-#     #dx=dx_condition
-# )
+text = chart.mark_text(color=theme["textColor"], align="center", dx=at.expr(at.expr.if_(at.datum.driScoreChange >= 0, 10, -13))).encode(
+    text=at.Text("driScoreChange:Q", format=".0f"),
+)
 
-# st.altair_chart(bars + text, use_container_width=True)
+st.altair_chart(bars + text, use_container_width=True)

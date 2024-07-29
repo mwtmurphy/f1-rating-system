@@ -7,7 +7,7 @@ import streamlit as st
 import streamlit_theme
 
 
-# load current driver data
+# load current constructor data
 st.set_page_config(layout="wide")
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
@@ -32,7 +32,7 @@ curr_df = curr_df.merge(col_df, how="left", on="constructorId")
 
 st.info(f"Results as of: {one_off_dict['last_race']}")
 
-st.markdown("# Current constructor ratings")
+st.markdown(f"# {curr_df.loc[0, 'constructorName']} is the current top-rated constructor")
 
 chart = at.Chart(curr_df).encode(
     y=at.Y("constructorName", sort=None, title="Constructor name"),
@@ -49,6 +49,33 @@ bars = chart.mark_bar(size=30).encode(
 
 text = chart.mark_text(color=theme["textColor"], align="left", dx=2).encode(
     text=at.Text("constructorScore:Q", format=".0f")
+)
+
+st.altair_chart(bars + text, use_container_width=True)
+
+# create most improved constructor vis
+agg_df = con_df[["constructorId", "constructorName", "conScoreChange"]].drop_duplicates().groupby(["constructorId", "constructorName"])["conScoreChange"].sum().reset_index()
+agg_df = agg_df.merge(col_df, how="left", on="constructorId").sort_values("conScoreChange", ascending=False).reset_index(drop=True)
+agg_df["baseline"] = 0
+
+st.markdown(f"# {agg_df.loc[0, 'constructorName']} is the most improved constructor in 2024")
+
+chart = at.Chart(agg_df).encode(
+    y=at.Y("constructorName", sort=None, title="Constructor name"),
+    x=at.X("conScoreChange", stack=None, title="Constructor rating change", scale=at.Scale(zero=False)),
+    x2="baseline",
+    tooltip=[
+        at.Tooltip("constructorName", title="Constructor name"),
+        at.Tooltip("conScoreChange:Q", format=".0f", title="Constructor rating change")
+    ]
+).properties(height=450)
+
+bars = chart.mark_bar(size=30).encode(
+    color=at.Color("hex_code:N", scale=None)
+)
+
+text = chart.mark_text(color=theme["textColor"], align="center", dx=at.expr(at.expr.if_(at.datum.conScoreChange >= 0, 10, -13))).encode(
+    text=at.Text("conScoreChange:Q", format=".0f"),
 )
 
 st.altair_chart(bars + text, use_container_width=True)

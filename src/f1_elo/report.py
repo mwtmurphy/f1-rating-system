@@ -21,6 +21,15 @@ def make_report_data():
     con_df = con_df.rename(columns={"name": "constructorName"})
     vis_df = vis_df.merge(con_df, on="constructorId", how="left")
 
+    # create data for vis'
+    vis_df["startDriScore"] = vis_df.groupby("driverId")["driverScore"].shift().fillna(1500)
+    vis_con_df = vis_df[["year", "round", "constructorId", "constructorScore"]].drop_duplicates().sort_values(["year", "round"]).reset_index(drop=True)
+    vis_con_df["startConScore"] = vis_con_df.groupby("constructorId")["constructorScore"].shift().fillna(1500)
+    vis_con_df = vis_con_df.drop(columns=["constructorScore"])
+    vis_df = vis_df.merge(vis_con_df, on=["year", "round", "constructorId"], how="left")
+    vis_df["driScoreChange"] = vis_df["driverScore"] - vis_df["startDriScore"]
+    vis_df["conScoreChange"] = vis_df["constructorScore"] - vis_df["startConScore"]
+
     # get drivers to be considered
     vis_df["outperformance"] = vis_df["actual"] - vis_df["expected"]
     out_df = vis_df.groupby("driverId")["outperformance"].mean().reset_index().rename(columns={"outperformance": "meanOutperformance"})
