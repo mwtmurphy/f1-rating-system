@@ -19,11 +19,11 @@ CONSTRUCTOR_STATUSES = [
     "underweight", "safety belt", "oil pump", "fuel leak", "injection", "distributor", "turbo", 
     "cv joint", "water pump", "spark plugs", "fuel pipe", "oil pipe", "axle", "water pipe", "magneto", 
     "supercharger", "engine misfire", "ers", "power unit", "brake duct", "seat", "debris", 
-    "cooling system", "undertray"
+    "cooling system", "undertray", "disqualified"
 ]
 
 DRIVER_STATUSES = [
-    "collision", "collision damage", "accident", "disqualified", "spun off", "107% rule", 
+    "collision", "collision damage", "accident", "spun off", "107% rule", 
     "did not qualify", "stalled", "did not prequalify", "damage"
     ]
 
