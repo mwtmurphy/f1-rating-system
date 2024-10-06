@@ -3,7 +3,7 @@ RAW_DIR = data/raw
 SRC_DIR = src/f1_elo
 
 app:
-	streamlit run ${SRC_DIR}/app.py
+	poetry run streamlit run ${SRC_DIR}/app.py
 
 data_e2e:
 	make data_preprocessed
