@@ -294,27 +294,6 @@ scikit-learn = ">=0.18.0"
 scipy = ">=1.0.0"
 
 [[package]]
-name = "beautifulsoup4"
-version = "4.12.3"
-description = "Screen-scraping library"
-optional = false
-python-versions = ">=3.6.0"
-files = [
-    {file = "beautifulsoup4-4.12.3-py3-none-any.whl", hash = "sha256:b80878c9f40111313e55da8ba20bdba06d8fa3969fc68304167741bbf9e082ed"},
-    {file = "beautifulsoup4-4.12.3.tar.gz", hash = "sha256:74e3d1928edc070d21748185c46e3fb33490f22f52a3addee9aee0f4f7781051"},
-]
-
-[package.dependencies]
-soupsieve = ">1.2"
-
-[package.extras]
-cchardet = ["cchardet"]
-chardet = ["chardet"]
-charset-normalizer = ["charset-normalizer"]
-html5lib = ["html5lib"]
-lxml = ["lxml"]
-
-[[package]]
 name = "billiard"
 version = "4.2.0"
 description = "Python multiprocessing fork with improvements and bugfixes"
@@ -3805,17 +3784,6 @@ files = [
 ]
 
 [[package]]
-name = "soupsieve"
-version = "2.6"
-description = "A modern CSS selector implementation for Beautiful Soup."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "soupsieve-2.6-py3-none-any.whl", hash = "sha256:e72c4ff06e4fb6e4b5a9f0f55fe6e81514581fca1515028625d0f299c602ccc9"},
-    {file = "soupsieve-2.6.tar.gz", hash = "sha256:e2e68417777af359ec65daac1057404a3c8a5455bb8abc36f1a9866ab1a51abb"},
-]
-
-[[package]]
 name = "sqltrie"
 version = "0.11.0"
 description = "SQL-based prefix tree inspired by pygtrie and python-diskcache"
@@ -3834,21 +3802,6 @@ pygtrie = "*"
 [package.extras]
 dev = ["sqltrie[tests]"]
 tests = ["mypy (==0.971)", "pyinstaller", "pytest (==7.2.0)", "pytest-benchmark", "pytest-cov (==3.0.0)", "pytest-mock (==3.8.2)", "pytest-sugar (==0.9.5)"]
-
-[[package]]
-name = "st-social-media-links"
-version = "0.1.3"
-description = "A Python package designed to assist in displaying social media links within Streamlit apps."
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "st_social_media_links-0.1.3-py3-none-any.whl", hash = "sha256:45dd95d430d1ac09077b92839803024eee526ced8648addcb772dcf1f8077f6a"},
-    {file = "st_social_media_links-0.1.3.tar.gz", hash = "sha256:262de6f447d6a332eb1be21f71fa0f074df24528877be6908846faa3ecdb80f2"},
-]
-
-[package.dependencies]
-beautifulsoup4 = ">=4.12.2"
-streamlit = ">=1.32.0"
 
 [[package]]
 name = "st-theme"
@@ -4297,4 +4250,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.*"
-content-hash = "04039f20ce39da9310520840e29dba38a7cad8a462a069fd42b3a192631351cf"
+content-hash = "72deba05aabd45da061c82ed15531c0fabea28f1553d03ac98c2aa405163453e"

@@ -1,6 +1,5 @@
 import plotly.express as px
 import streamlit as st
-import st_social_media_links
 
 # app config
 goat_page = st.Page("pages/goat.py", title="Who is the F1 Goat?", url_path="the-goat", icon=":material/star:")
@@ -11,14 +10,13 @@ page_nav = st.navigation([goat_page, dri_page, con_page])
 page_nav.run()
 
 st.sidebar.markdown("""
-    Created by Mitchell Murphy, Lead Data Scientist with over 8 years of experience. See the code 
-    for this project [here](https://github.com/mwtmurphy/f1-rating-system).
+    Created by Mitchell Murphy, Data Scientist with an interest 
+    in improving decision-making with data. 
+    
+    See the code for this project 
+    [here](https://github.com/mwtmurphy/f1-rating-system).
                     
-    If you like this project, see my other projects or send me a message via the links below:
+    If you like this project, you can check out more of my other work 
+    on [Github](https://github.com/mwtmurphy) or connect with me on 
+    [LinkedIn](https://www.linkedin.com/in/mwtmurphy).
 """)
-social_icons = st_social_media_links.SocialMediaIcons([
-    "https://mwtmurphy.github.io/portfolio/",
-    "https://github.com/mwtmurphy",
-    "https://www.linkedin.com/in/mwtmurphy/"
-])
-social_icons.render(sidebar=True)
