@@ -12,13 +12,23 @@ import pandas as pd
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
 
+# column indexes
+CON_IX = 4 # constructor id
+DRI_IX = 5 # driver id
+POS_IX = 6 # driver position
+STA_IX = 8 # race status
+CSC_IX = 9 # new constructor score
+DSC_IX = 10 # new driver score
+EXP_IX = 11 # expected outcome
+TRU_IX = 12 # true outcome
+
 MOD_DF = pd.read_csv(CONFIG["data"]["features_path"])
 MOD_DF[["constructorScore", "driverScore", "expected", "actual"]] = None
 IX_CHUNKS = MOD_DF.reset_index().groupby(["year", "round"])["index"].agg(["min", "max"]).values
 MOD_MAT = MOD_DF.values
 
 DRI_RTG = {dri: CONFIG["model"]["start_score"] for dri in set(MOD_DF["driverId"])}
-CON_RTG = {con: CONFIG["model"]["start_score"] for con in set(MOD_DF["constructorId"])}
+CON_RTG = {con: CONFIG["model"]["start_score"] for con in set(MOD_DF["constructorYearId"])}
 
 def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Union[float, None]:
     '''If export == False, returns negative RMSEE based on params. 
@@ -33,12 +43,12 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
         yr_mat = MOD_MAT[start_ix:end_ix+1]
         n_rnds = yr_mat[-1, 1]
 
-        rnd_dri_scores = {dri: {"diff": 0, "n": 0, "exp": 0, "act": 0} for dri in yr_mat[:, 4]}
-        rnd_con_scores = {con: {"diff": 0, "n": 0, "exp": 0, "act": 0} for con in yr_mat[:, 3]}
+        rnd_dri_scores = {dri: {"diff": 0, "n": 0, "exp": 0, "act": 0} for dri in yr_mat[:, DRI_IX]}
+        rnd_con_scores = {con: {"diff": 0, "n": 0, "exp": 0, "act": 0} for con in yr_mat[:, CON_IX]}
 
         for ix_1, ix_2 in itertools.combinations(range(yr_mat.shape[0]), 2):
-            con_a, dri_a, pos_a, st_a = yr_mat[ix_1, [3, 4, 5, 7]]
-            con_b, dri_b, pos_b, st_b = yr_mat[ix_2, [3, 4, 5, 7]]
+            con_a, dri_a, pos_a, st_a = yr_mat[ix_1, [CON_IX, DRI_IX, POS_IX, STA_IX]]
+            con_b, dri_b, pos_b, st_b = yr_mat[ix_2, [CON_IX, DRI_IX, POS_IX, STA_IX]]
     
             # continue if drivers in same car or a driver does not finish for misc reason
             if pos_a == pos_b or "misc retirement" in [st_a, st_b]:
@@ -92,17 +102,17 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
         for dri in rnd_dri_scores.keys():
             if rnd_dri_scores[dri]["n"] != 0: # more than 1 car on grid
                 dri_scores[dri] += ((1 / (1 + w)) * rnd_dri_scores[dri]["diff"] / rnd_dri_scores[dri]["n"])
-                
-        yr_mat[:, 9] = list(map(lambda el: dri_scores[el], yr_mat[:, 4])) # driver score
-        yr_mat[:, 10] = list(map(lambda el: rnd_dri_scores[el]["exp"], yr_mat[:, 4])) # expected outcome
-        yr_mat[:, 11] = list(map(lambda el: rnd_dri_scores[el]["act"], yr_mat[:, 4])) # actual outcome
+
+        yr_mat[:, DSC_IX] = list(map(lambda el: dri_scores[el], yr_mat[:, DRI_IX])) # driver score
+        yr_mat[:, EXP_IX] = list(map(lambda el: rnd_dri_scores[el]["exp"], yr_mat[:, DRI_IX])) # expected outcome
+        yr_mat[:, TRU_IX] = list(map(lambda el: rnd_dri_scores[el]["act"], yr_mat[:, DRI_IX])) # actual outcome
 
         # update constructor values for finishing drivers
         for con in rnd_con_scores.keys():
             if rnd_con_scores[con]["n"] != 0: # more than 1 car on grid
                 con_scores[con] += ((w / (1 + w)) * rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
         
-        yr_mat[:, 8] = list(map(lambda el: con_scores[el], yr_mat[:, 3]))
+        yr_mat[:, CSC_IX] = list(map(lambda el: con_scores[el], yr_mat[:, CON_IX]))
 
     if export == False:
         err_df = pd.DataFrame({"pred": exp, "true": out})

@@ -1,5 +1,6 @@
 import yaml
 
+import numpy as np
 import pandas as pd
 
 
@@ -50,6 +51,11 @@ def create_features():
     model'''
 
     pre_df = pd.read_csv(CONFIG["data"]["preprocessed_path"])
+
+    # impute constructor-year id if doesn't exist
+    pre_df["constructorYearId"] = pre_df[["constructorId", "constructorYearId"]].apply(
+        lambda row: row.iloc[1] if not np.isnan(row.iloc[1]) else row.iloc[0]
+    , axis=1).astype(int)
 
     # infer positions for non-finishers using qualifying position 
     car_df = pre_df[["year", "round", "grid"]].drop_duplicates()

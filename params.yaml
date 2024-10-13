@@ -1,5 +1,6 @@
 data:
   constructors_csv: 'data/raw/constructors.csv'
+  constructor_year_csv: 'data/raw/constructor_year.csv'
   drivers_csv: 'data/raw/drivers.csv'
   results_csv: 'data/raw/results.csv'
   status_csv: 'data/raw/status.csv'
