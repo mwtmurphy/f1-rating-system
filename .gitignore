@@ -157,6 +157,7 @@ cython_debug/
 # Data
 data/interim/*.csv
 data/raw/*.csv
+!data/raw/constructor_year.csv
 
 # Pyenv
 .python-version
