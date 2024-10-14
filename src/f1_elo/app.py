@@ -19,7 +19,7 @@ st.sidebar.markdown("""
     [here](https://github.com/mwtmurphy/f1-rating-system). Data for 
     this project is sourced from the [Ergast API](http://ergast.com/mrd).
                     
-    If you like this project, you can check out more of my other work 
-    on [Github](https://github.com/mwtmurphy) or connect with me on 
+    If you like this project, see my other work on 
+    [Github](https://github.com/mwtmurphy) or connect with me on 
     [LinkedIn](https://www.linkedin.com/in/mwtmurphy).
 """)

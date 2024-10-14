@@ -6,11 +6,9 @@ import pandas as pd
 import streamlit as st
 import streamlit_theme
 
-# set page config and theme
+# page config
 st.set_page_config(layout="wide")
 theme = streamlit_theme.st_theme()
-
-# load data config
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
 
@@ -29,9 +27,9 @@ def load_data() -> tuple:
 
     return con_df, last_race_dict
 
-con_df, last_race_dict = load_data()
 
-# display data recency and sources
+# steamlit page
+con_df, last_race_dict = load_data()
 st.info(f"Results as of: {last_race_dict['last_race']}.")
 
 # create dataframe for comparing constructors

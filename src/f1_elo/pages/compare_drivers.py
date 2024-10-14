@@ -6,18 +6,17 @@ import pandas as pd
 import streamlit as st
 import streamlit_theme
 
-# set page config and theme
+# page config
 st.set_page_config(layout="wide")
 theme = streamlit_theme.st_theme()
-
-# load data config
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
 
-# load and cache data for visualisations
+
+# helper functions
 @st.cache_data
 def load_data() -> tuple:
-    '''Returns data for current driver plots'''
+    '''Load and cache data for plots on page'''
 
     # load data for comparing drivers
     hist_df = pd.read_csv(CONFIG["data"]["hist_path"])
@@ -28,12 +27,12 @@ def load_data() -> tuple:
 
     return hist_df, last_race_dict
 
-hist_df, last_race_dict = load_data()
 
-# display data recency and sources
+# streamlit app
+hist_df, last_race_dict = load_data()
 st.info(f"Results as of: {last_race_dict['last_race']}.")
 
-# create dataframe for comparing drivers
+# create dataframe for comparing drivers based on user selection
 selected_drivers = st.multiselect(label="Select drivers to compare.", options=sorted(list(set(hist_df["driverName"]))), default=["Max Verstappen", "Lando Norris"])
 sd_sub_df = hist_df[hist_df["driverName"].isin(selected_drivers)]
 

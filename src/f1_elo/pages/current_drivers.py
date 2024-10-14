@@ -6,19 +6,20 @@ import pandas as pd
 import streamlit as st
 import streamlit_theme
 
-# load current driver data
+# page config
 st.set_page_config(layout="wide")
+theme = streamlit_theme.st_theme()
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
 
-# data import
+
+# helper functions
 @st.cache_data
 def load_data() -> tuple:
-    '''Returns data for current driver plots'''
+    '''Load and cache data for plots on page'''
 
     dri_df = pd.read_csv(CONFIG["data"]["2024_path"])
     col_df = pd.read_csv(CONFIG["data"]["colour_path"])
-    hist_df = pd.read_csv(CONFIG["data"]["hist_path"])
 
     # create current driver rating data
     curr_df = dri_df.loc[dri_df["round"] == dri_df["round"].max(), ["constructorId", "driverName", "driverScore"]].sort_values("driverScore", ascending=False).reset_index(drop=True)
@@ -33,18 +34,16 @@ def load_data() -> tuple:
     imp_df["baseline"] = 0
 
     with open(CONFIG["data"]["one_off_path"], "r") as infile:
-        one_off_dict = json.load(infile)
+        last_race_dict = json.load(infile)
 
-    return dri_df, one_off_dict, col_df, hist_df, imp_df
+    return curr_df, imp_df, last_race_dict
 
-theme = streamlit_theme.st_theme()
-dri_df, one_off_dict, col_df, hist_df, imp_df = load_data()
-curr_df = dri_df.loc[dri_df["round"] == dri_df["round"].max(), ["constructorId", "driverName", "driverScore"]].sort_values("driverScore", ascending=False).reset_index(drop=True)
-curr_df = curr_df.merge(col_df, how="left", on="constructorId")
 
-# create current top-rated driver vis
-st.info(f"Results as of: {one_off_dict['last_race']}")
+# streamlit page 
+curr_df, imp_df, last_race_dict = load_data()
+st.info(f"Results as of: {last_race_dict['last_race']}")
 
+# plot current driver ratings
 st.markdown(f"# {curr_df.loc[0, 'driverName']} is the current top-rated driver")
 
 chart = at.Chart(curr_df).encode(
@@ -55,18 +54,15 @@ chart = at.Chart(curr_df).encode(
         at.Tooltip("driverScore:Q", format=".0f", title="Driver score")
     ]
 ).properties(height=800)
-
 bars = chart.mark_bar(size=30).encode(
     color=at.Color("hex_code:N", scale=None)
 )
-
 text = chart.mark_text(color=theme["textColor"], align="left", dx=2).encode(
     text=at.Text("driverScore:Q", format=".0f")
 )
-
 st.altair_chart(bars + text, use_container_width=True)
 
-# plot most improved driver
+# plot rating changes for current drivers
 st.markdown(f"# {imp_df.loc[0, 'driverName']} is the most improved driver in 2024")
 
 chart = at.Chart(imp_df).encode(
@@ -78,11 +74,9 @@ chart = at.Chart(imp_df).encode(
         at.Tooltip("cumDriScoreChange:Q", format=".0f", title="Driver rating change")
     ]
 ).properties(height=800)
-
 bars = chart.mark_bar(size=30).encode(
     color=at.Color("hex_code:N", scale=None)
 )
-
 text = chart.mark_text(
     color=theme["textColor"], 
     align=at.expr(at.expr.if_(at.datum.cumDriScoreChange >= 0, "left", "right")), 
@@ -90,5 +84,4 @@ text = chart.mark_text(
 ).encode(
     text=at.Text("cumDriScoreChange:Q", format=".0f"),
 )
-
 st.altair_chart(bars + text, use_container_width=True)
