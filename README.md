@@ -25,7 +25,7 @@ There are many opinions. Let's build a rating system to see if we can identify -
 
 ### Prerequisites
 
-This project is built using Make, Python 3.11.19 and Poetry 1.8.3. Install these dependencies before continuing.
+This project is built using Make, Python 3.11 and Poetry 1.8. Install these dependencies before continuing.
 
 ### Data 
 
@@ -46,8 +46,6 @@ The streamlit app can be found in `src/f1_elo`. Run `make app` to explore the ap
 This project has no tests.
 
 ## Contributing
-
-- Mitchell Murphy (maintainer)
 
 This project is open to issue submissions for bugs and improvements to make this app better.
 

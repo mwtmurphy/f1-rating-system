@@ -9,12 +9,9 @@ data:
   preprocessed_path: 'data/interim/preprocessed_data.csv'
   features_path: 'data/interim/features.csv'
   modelled_path: 'data/interim/modelled_data.csv'
-
-  goat_path: 'data/processed/goat.csv'
-  hist_path: 'data/processed/hist.csv'
-  2024_path: 'data/processed/2024.csv'
   metrics_path: 'models/metrics.json'
   params_path: 'models/params.yaml'
+  hist_path: 'data/processed/hist.csv'
   last_race_path: 'data/processed/last_race.json'
   avg_goat_path: 'data/processed/avg_goat.csv'
   avg_hist_path: 'data/processed/avg_hist.csv'
