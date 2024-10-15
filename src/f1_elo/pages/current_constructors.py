@@ -19,32 +19,23 @@ with open("params.yaml") as conf_file:
 def load_data() -> tuple:
     '''Load and cache data for plots on page'''
 
-    con_df = pd.read_csv(CONFIG["data"]["2024_path"])
-    col_df = pd.read_csv(CONFIG["data"]["colour_path"])
+    cur_con_df = pd.read_csv(CONFIG["data"]["cur_con_path"])
+    con_imp_df = pd.read_csv(CONFIG["data"]["con_imp_path"])
 
-    # create dataset for plotting current constructor ratings
-    curr_df = con_df.loc[con_df["round"] == con_df["round"].max(), ["constructorId", "constructorName", "constructorScore"]].drop_duplicates().sort_values("constructorScore", ascending=False).reset_index(drop=True)
-    curr_df = curr_df.merge(col_df, how="left", on="constructorId")
-
-    # create dataset for plotting rating changes for current constructors
-    agg_df = con_df[["constructorId", "constructorName", "conScoreChange"]].drop_duplicates().groupby(["constructorId", "constructorName"])["conScoreChange"].sum().reset_index()
-    agg_df = agg_df.merge(col_df, how="left", on="constructorId").sort_values("conScoreChange", ascending=False).reset_index(drop=True)
-    agg_df["baseline"] = 0
-
-    with open(CONFIG["data"]["one_off_path"], "r") as infile:
+    with open(CONFIG["data"]["last_race_path"], "r") as infile:
         last_race_dict = json.load(infile)
 
-    return curr_df, agg_df, last_race_dict
+    return cur_con_df, con_imp_df, last_race_dict
 
 
-# streamlit app
-curr_df, agg_df, last_race_dict = load_data()
+# streamlit page
+cur_con_df, con_imp_df, last_race_dict = load_data()
 st.info(f"Results as of: {last_race_dict['last_race']}")
 
 # plot current constructor ratings
-st.markdown(f"# {curr_df.loc[0, 'constructorName']} is the current top-rated constructor")
+st.markdown(f"# {cur_con_df.loc[0, 'constructorName']} is the current top-rated constructor")
 
-chart = at.Chart(curr_df).encode(
+chart = at.Chart(cur_con_df).encode(
     y=at.Y("constructorName", sort=None, title="Constructor name"),
     x=at.X("constructorScore", stack=None, title="Constructor rating", scale=at.Scale(zero=False)),
     tooltip=[
@@ -61,9 +52,9 @@ text = chart.mark_text(color=theme["textColor"], align="left", dx=2).encode(
 st.altair_chart(bars + text, use_container_width=True)
 
 # plot rating changes for current constructors
-st.markdown(f"# {agg_df.loc[0, 'constructorName']} is the most improved constructor in 2024")
+st.markdown(f"# {con_imp_df.loc[0, 'constructorName']} is the most improved constructor in 2024")
 
-chart = at.Chart(agg_df).encode(
+chart = at.Chart(con_imp_df).encode(
     y=at.Y("constructorName", sort=None, title="Constructor name"),
     x=at.X("conScoreChange", stack=None, title="Constructor rating change", scale=at.Scale(zero=False)),
     x2="baseline",

@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 import streamlit_theme
 
+
 # page config
 st.set_page_config(layout="wide")
 theme = streamlit_theme.st_theme()
@@ -18,35 +19,23 @@ with open("params.yaml") as conf_file:
 def load_data() -> tuple:
     '''Load and cache data for plots on page'''
 
-    dri_df = pd.read_csv(CONFIG["data"]["2024_path"])
-    col_df = pd.read_csv(CONFIG["data"]["colour_path"])
+    cur_dri_df = pd.read_csv(CONFIG["data"]["cur_dri_path"])
+    dri_imp_df = pd.read_csv(CONFIG["data"]["dri_imp_path"])
 
-    # create current driver rating data
-    curr_df = dri_df.loc[dri_df["round"] == dri_df["round"].max(), ["constructorId", "driverName", "driverScore"]].sort_values("driverScore", ascending=False).reset_index(drop=True)
-    curr_df = curr_df.merge(col_df, how="left", on="constructorId")
-
-    # create driver improvement data
-    imp_df = dri_df.copy()
-    imp_df["cumDriScoreChange"] = imp_df.groupby("driverId")["driScoreChange"].cumsum()
-    imp_df = imp_df.sort_values("round").drop_duplicates("driverId", keep="last")[["constructorId", "driverName", "cumDriScoreChange"]]
-    imp_df = imp_df.merge(col_df, how="left", on="constructorId").sort_values("cumDriScoreChange", ascending=False)
-    imp_df = imp_df.reset_index(drop=True).drop(columns="constructorId")
-    imp_df["baseline"] = 0
-
-    with open(CONFIG["data"]["one_off_path"], "r") as infile:
+    with open(CONFIG["data"]["last_race_path"], "r") as infile:
         last_race_dict = json.load(infile)
 
-    return curr_df, imp_df, last_race_dict
+    return cur_dri_df, dri_imp_df, last_race_dict
 
 
 # streamlit page 
-curr_df, imp_df, last_race_dict = load_data()
+cur_dri_df, dri_imp_df, last_race_dict = load_data()
 st.info(f"Results as of: {last_race_dict['last_race']}")
 
 # plot current driver ratings
-st.markdown(f"# {curr_df.loc[0, 'driverName']} is the current top-rated driver")
+st.markdown(f"# {cur_dri_df.loc[0, 'driverName']} is the current top-rated driver")
 
-chart = at.Chart(curr_df).encode(
+chart = at.Chart(cur_dri_df).encode(
     y=at.Y("driverName", sort=None, title="Driver name"),
     x=at.X("driverScore", stack=None, title="Driver rating", scale=at.Scale(zero=False)),
     tooltip=[
@@ -63,9 +52,9 @@ text = chart.mark_text(color=theme["textColor"], align="left", dx=2).encode(
 st.altair_chart(bars + text, use_container_width=True)
 
 # plot rating changes for current drivers
-st.markdown(f"# {imp_df.loc[0, 'driverName']} is the most improved driver in 2024")
+st.markdown(f"# {dri_imp_df.loc[0, 'driverName']} is the most improved driver in 2024")
 
-chart = at.Chart(imp_df).encode(
+chart = at.Chart(dri_imp_df).encode(
     y=at.Y("driverName", sort=None, title="Driver name"),
     x=at.X("cumDriScoreChange", stack=None, title="Driver rating change", scale=at.Scale(zero=False)),
     x2="baseline",

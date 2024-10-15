@@ -6,35 +6,35 @@ import pandas as pd
 import streamlit as st
 import streamlit_theme
 
+
 # page config
 st.set_page_config(layout="wide")
 theme = streamlit_theme.st_theme()
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
 
-# load and cache data for visualisations
+
+# helper functions
 @st.cache_data
 def load_data() -> tuple:
-    '''Returns data for current driver plots'''
+    '''Load and cache data for plots on page'''
 
-    # load data for comparing constructors
     hist_df = pd.read_csv(CONFIG["data"]["hist_path"])
-    con_df = hist_df[["date", "constructorId", "constructorName", "constructorScore"]].drop_duplicates()
+    con_hist_df = hist_df[["date", "constructorId", "constructorName", "constructorScore"]].drop_duplicates()
 
-    # load data recency json
-    with open(CONFIG["data"]["one_off_path"], "r") as infile:
+    with open(CONFIG["data"]["last_race_path"], "r") as infile:
         last_race_dict = json.load(infile)
 
-    return con_df, last_race_dict
+    return con_hist_df, last_race_dict
 
 
 # steamlit page
-con_df, last_race_dict = load_data()
+con_hist_df, last_race_dict = load_data()
 st.info(f"Results as of: {last_race_dict['last_race']}.")
 
 # create dataframe for comparing constructors
-selected_constructors = st.multiselect(label="Select constructors to compare.", options=sorted(list(set(con_df["constructorName"]))), default=["Red Bull", "McLaren"])
-sd_sub_df = con_df[con_df["constructorName"].isin(selected_constructors)]
+selected_constructors = st.multiselect(label="Select constructors to compare.", options=sorted(list(set(con_hist_df["constructorName"]))), default=["Red Bull", "McLaren"])
+sd_sub_df = con_hist_df[con_hist_df["constructorName"].isin(selected_constructors)]
 
 # plot comparison over career timeline
 line_chart = at.Chart(sd_sub_df).mark_line().encode(

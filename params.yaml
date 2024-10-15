@@ -1,4 +1,5 @@
 data:
+  colour_csv: 'data/raw/constructor_colours.csv'
   constructors_csv: 'data/raw/constructors.csv'
   constructor_year_csv: 'data/raw/constructor_year.csv'
   drivers_csv: 'data/raw/drivers.csv'
@@ -8,14 +9,20 @@ data:
   preprocessed_path: 'data/interim/preprocessed_data.csv'
   features_path: 'data/interim/features.csv'
   modelled_path: 'data/interim/modelled_data.csv'
+
   goat_path: 'data/processed/goat.csv'
   hist_path: 'data/processed/hist.csv'
   2024_path: 'data/processed/2024.csv'
-  one_off_path: 'data/processed/one_off.json'
   metrics_path: 'models/metrics.json'
   params_path: 'models/params.yaml'
-  colour_path: 'data/processed/con_colours.csv'
-  
+  last_race_path: 'data/processed/last_race.json'
+  avg_goat_path: 'data/processed/avg_goat.csv'
+  avg_hist_path: 'data/processed/avg_hist.csv'
+  cur_dri_path: 'data/processed/cur_dri.csv'
+  dri_imp_path: 'data/processed/dri_imp.csv'
+  cur_con_path: 'data/processed/cur_con.csv'
+  con_imp_path: 'data/processed/con_imp.csv'
+
 model:
   opt_params:
     pbounds:

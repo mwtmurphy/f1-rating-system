@@ -158,6 +158,7 @@ cython_debug/
 data/interim/*.csv
 data/raw/*.csv
 !data/raw/constructor_year.csv
+!data/raw/constructor_colours.csv
 
 # Pyenv
 .python-version
