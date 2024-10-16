@@ -1,5 +1,5 @@
-import plotly.express as px
 import streamlit as st
+
 
 # app config
 goat_page = st.Page("pages/goat.py", title="Who is the F1 Goat?", url_path="who-is-the-goat", icon=":material/star:")
