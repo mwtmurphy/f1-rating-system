@@ -8,7 +8,7 @@ import streamlit_theme
 
 
 # page config
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="F1 rating system | Compare drivers", layout="wide")
 theme = streamlit_theme.st_theme()
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
@@ -38,11 +38,11 @@ sd_sub_df = dri_hist_df[dri_hist_df["driverName"].isin(selected_drivers)]
 # plot comparison over career timeline
 line_chart = at.Chart(sd_sub_df).mark_line().encode(
     x=at.X("date", stack=None, title="Date"),
-    y=at.Y("driverScore", sort=None, title="Driver score", scale=at.Scale(zero=False)),
-    color=at.Text("driverName", title="Driver name"),
+    y=at.Y("driverScore", sort=None, title="Rating", scale=at.Scale(zero=False)),
+    color=at.Text("driverName", title="Driver"),
     tooltip=[
-        at.Tooltip("driverName", title="Driver name"),
-        at.Tooltip("driverScore:Q", format=".0f", title="Driver score")
+        at.Tooltip("driverName", title="Driver"),
+        at.Tooltip("driverScore:Q", format=".0f", title="Rating")
     ]
 )
 

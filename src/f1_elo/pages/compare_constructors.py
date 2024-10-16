@@ -8,7 +8,7 @@ import streamlit_theme
 
 
 # page config
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="F1 rating system | Compare constructors", layout="wide")
 theme = streamlit_theme.st_theme()
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
@@ -39,7 +39,7 @@ sd_sub_df = con_hist_df[con_hist_df["constructorName"].isin(selected_constructor
 # plot comparison over career timeline
 line_chart = at.Chart(sd_sub_df).mark_line().encode(
     x=at.X("date", stack=None, title="Date"),
-    y=at.Y("constructorScore", sort=None, title="Constructor rating", scale=at.Scale(zero=False)),
+    y=at.Y("constructorScore", sort=None, title="Rating", scale=at.Scale(zero=False)),
     color=at.Text("constructorName", title="Constructor"),
     tooltip=[
         at.Tooltip("constructorName", title="Constructor"),

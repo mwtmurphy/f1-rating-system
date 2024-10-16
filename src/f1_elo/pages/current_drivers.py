@@ -8,7 +8,7 @@ import streamlit_theme
 
 
 # page config
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="F1 rating system | Current drivers", layout="wide")
 theme = streamlit_theme.st_theme()
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
