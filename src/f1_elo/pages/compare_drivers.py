@@ -4,12 +4,10 @@ import yaml
 import altair as at
 import pandas as pd
 import streamlit as st
-import streamlit_theme
 
 
 # page config
 st.set_page_config(page_title="F1 rating system | Compare drivers", layout="wide")
-theme = streamlit_theme.st_theme()
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
 

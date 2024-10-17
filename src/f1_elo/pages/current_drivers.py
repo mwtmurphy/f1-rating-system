@@ -36,11 +36,11 @@ st.info(f"Results as of: {last_race_dict['last_race']}")
 st.markdown(f"# {cur_dri_df.loc[0, 'driverName']} is the current top-rated driver")
 
 chart = at.Chart(cur_dri_df).encode(
-    y=at.Y("driverName", sort=None, title="Driver name"),
-    x=at.X("driverScore", stack=None, title="Driver rating", scale=at.Scale(zero=False)),
+    y=at.Y("driverName", sort=None, title="Driver"),
+    x=at.X("driverScore", stack=None, title="Rating", scale=at.Scale(zero=False)),
     tooltip=[
-        at.Tooltip("driverName", title="Driver name"),
-        at.Tooltip("driverScore:Q", format=".0f", title="Driver score")
+        at.Tooltip("driverName", title="Driver"),
+        at.Tooltip("driverScore:Q", format=".0f", title="Rating")
     ]
 ).properties(height=800)
 bars = chart.mark_bar(size=30).encode(
@@ -55,12 +55,12 @@ st.altair_chart(bars + text, use_container_width=True)
 st.markdown(f"# {dri_imp_df.loc[0, 'driverName']} is the most improved driver in 2024")
 
 chart = at.Chart(dri_imp_df).encode(
-    y=at.Y("driverName", sort=None, title="Driver name"),
-    x=at.X("cumDriScoreChange", stack=None, title="Driver rating change", scale=at.Scale(zero=False)),
+    y=at.Y("driverName", sort=None, title="Driver"),
+    x=at.X("cumDriScoreChange", stack=None, title="Rating change", scale=at.Scale(zero=False)),
     x2="baseline",
     tooltip=[
-        at.Tooltip("driverName", title="Driver name"),
-        at.Tooltip("cumDriScoreChange:Q", format=".0f", title="Driver rating change")
+        at.Tooltip("driverName", title="Driver"),
+        at.Tooltip("cumDriScoreChange:Q", format=".0f", title="Rating change")
     ]
 ).properties(height=800)
 bars = chart.mark_bar(size=30).encode(

@@ -36,11 +36,11 @@ st.info(f"Results as of: {last_race_dict['last_race']}")
 st.markdown(f"# {cur_con_df.loc[0, 'constructorName']} is the current top-rated constructor")
 
 chart = at.Chart(cur_con_df).encode(
-    y=at.Y("constructorName", sort=None, title="Constructor name"),
-    x=at.X("constructorScore", stack=None, title="Constructor rating", scale=at.Scale(zero=False)),
+    y=at.Y("constructorName", sort=None, title="Constructor"),
+    x=at.X("constructorScore", stack=None, title="Rating", scale=at.Scale(zero=False)),
     tooltip=[
-        at.Tooltip("constructorName", title="Constructor name"),
-        at.Tooltip("constructorScore:Q", format=".0f", title="Constructor score")
+        at.Tooltip("constructorName", title="Constructor"),
+        at.Tooltip("constructorScore:Q", format=".0f", title="Rating")
     ]
 ).properties(height=450)
 bars = chart.mark_bar(size=30).encode(
@@ -55,12 +55,12 @@ st.altair_chart(bars + text, use_container_width=True)
 st.markdown(f"# {con_imp_df.loc[0, 'constructorName']} is the most improved constructor in 2024")
 
 chart = at.Chart(con_imp_df).encode(
-    y=at.Y("constructorName", sort=None, title="Constructor name"),
-    x=at.X("conScoreChange", stack=None, title="Constructor rating change", scale=at.Scale(zero=False)),
+    y=at.Y("constructorName", sort=None, title="Constructor"),
+    x=at.X("conScoreChange", stack=None, title="Rating change", scale=at.Scale(zero=False)),
     x2="baseline",
     tooltip=[
-        at.Tooltip("constructorName", title="Constructor name"),
-        at.Tooltip("conScoreChange:Q", format=".0f", title="Constructor rating change")
+        at.Tooltip("constructorName", title="Constructor"),
+        at.Tooltip("conScoreChange:Q", format=".0f", title="Rating change")
     ]
 ).properties(height=450)
 bars = chart.mark_bar(size=30).encode(

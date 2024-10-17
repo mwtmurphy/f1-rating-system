@@ -1,18 +1,16 @@
 import streamlit as st
-import streamlit_theme
 
 
 # page config
 st.set_page_config(page_title="F1 rating system | Home")
-theme = streamlit_theme.st_theme()
 
 
 # streamlit page 
-st.title("Is your favourite driver or constructor as good as you think they are?")
+st.title("Is your favourite driver/constructor as good as you think they are?")
 
 st.markdown("""
     A tale as old as time: X driver is the GOAT, Y driver only did well because constructor Z built 
-    a rocket ship, etc.. Cue discourse with a 5/50% chance of developing into an argument.
+    a rocket ship, etc.. Cue discourse with a 5 to 50% chance of developing into an argument.
 
     Well, this app joins said non-argument, but does it using data so you can't blame the creator.
 
