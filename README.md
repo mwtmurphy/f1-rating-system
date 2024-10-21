@@ -37,7 +37,7 @@ Run `make env` in a command line interface (e.g. iTerm) to install Python depend
 
 ## Usage
 
-The model can be found in `src/f1_elo`. Run `make data_e2e` to build the model and predict ratings per driver and constructor for all races.
+The algorithm can be found in `src/f1_elo`. Run `make data_e2e` to build the model and predict ratings per driver and constructor for all races.
 
 The streamlit app can be found in `src/f1_elo`. Run `make app` to explore the app locally.
 
