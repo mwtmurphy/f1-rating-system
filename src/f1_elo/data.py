@@ -24,7 +24,7 @@ def preprocess_data():
     pre_df = pre_df[col_order].sort_values(sort_order)
 
     pre_df.to_csv(CONFIG["data"]["preprocessed_path"], index=False)
-    print(pre_df.info())
+
 
 if __name__=="__main__":
     preprocess_data()
