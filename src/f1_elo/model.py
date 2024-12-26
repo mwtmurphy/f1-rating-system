@@ -6,6 +6,7 @@ import yaml
 import bayes_opt
 import numpy as np
 import pandas as pd
+from scipy import optimize
 
 
 # global variables
@@ -30,18 +31,18 @@ MOD_MAT = MOD_DF.values
 DRI_RTG = {dri: CONFIG["model"]["start_score"] for dri in set(MOD_DF["driverId"])}
 CON_RTG = {con: CONFIG["model"]["start_score"] for con in set(MOD_DF["constructorYearId"])}
 
-def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Union[float, None]:
-    '''If export == False, returns negative RMSEE based on params. 
-    If export == True, exports modelled data to 'interim' data folder 
-    for data reporting.'''
+def model_data(params: dict, export: bool = False) -> float:
+    '''Returns mean negative log likelihood of the rating system. If
+    export = True, also exports results for data reporting.'''
 
     dri_scores = DRI_RTG.copy()
     con_scores = CON_RTG.copy()
     exp, out = [], []
+    log_likelihood = 0
+    n_pred = 0
 
     for start_ix, end_ix in IX_CHUNKS:
         yr_mat = MOD_MAT[start_ix:end_ix+1]
-        n_rnds = yr_mat[-1, 1]
 
         rnd_dri_scores = {dri: {"diff": 0, "n": 0, "exp": 0, "act": 0} for dri in yr_mat[:, DRI_IX]}
         rnd_con_scores = {con: {"diff": 0, "n": 0, "exp": 0, "act": 0} for con in yr_mat[:, CON_IX]}
@@ -55,24 +56,29 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
                 continue
 
             # get current rating
-            elo_a = dri_scores[dri_a] + (w * con_scores[con_a])
-            elo_b = dri_scores[dri_b] + (w * con_scores[con_b])
+            elo_a = dri_scores[dri_a] + (params[2] * con_scores[con_a])
+            elo_b = dri_scores[dri_b] + (params[2] * con_scores[con_b])
             
             # create expected scores
-            e_a = 1 / (1 + np.exp(-(elo_a - elo_b) / c))
+            e_a = 1 / (1 + np.exp(-(elo_a - elo_b) / params[1]))
             e_b = 1 - e_a
 
-            # create true scores
+            # create true scores and track log likelihood 
             if pos_a < pos_b:
                 o_a = 1
                 o_b = 0
+                log_likelihood += np.log(max(e_a, 1E-10))
+
             else:
                 o_a = 0
                 o_b = 1
+                log_likelihood += np.log(max(e_b, 1E-10))
+
+            n_pred += 1
                 
             # calculate score change and update round scores
-            diff_a = k * (o_a - e_a)
-            diff_b = k * (o_b - e_b)
+            diff_a = params[0] * (o_a - e_a)
+            diff_b = params[0] * (o_b - e_b)
 
             # log driver results and changes if neither retire due to car failure (not attributable to drivers)
             if "constructor retirement" not in [st_a, st_b]:
@@ -101,7 +107,7 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
         # update driver values for finishing drivers and driver-caused retirements
         for dri in rnd_dri_scores.keys():
             if rnd_dri_scores[dri]["n"] != 0: # more than 1 car on grid
-                dri_scores[dri] += ((1 / (1 + w)) * rnd_dri_scores[dri]["diff"] / rnd_dri_scores[dri]["n"])
+                dri_scores[dri] += ((1 / (1 + params[2])) * rnd_dri_scores[dri]["diff"] / rnd_dri_scores[dri]["n"])
 
         yr_mat[:, DSC_IX] = list(map(lambda el: dri_scores[el], yr_mat[:, DRI_IX])) # driver score
         yr_mat[:, EXP_IX] = list(map(lambda el: rnd_dri_scores[el]["exp"], yr_mat[:, DRI_IX])) # expected outcome
@@ -110,53 +116,41 @@ def model_data(k: float, c: float, w: float, export: bool = False) -> typing.Uni
         # update constructor values for finishing drivers
         for con in rnd_con_scores.keys():
             if rnd_con_scores[con]["n"] != 0: # more than 1 car on grid
-                con_scores[con] += ((w / (1 + w)) * rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
+                con_scores[con] += ((params[2] / (1 + params[2])) * rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
         
         yr_mat[:, CSC_IX] = list(map(lambda el: con_scores[el], yr_mat[:, CON_IX]))
 
-    if export == False:
-        err_df = pd.DataFrame({"pred": exp, "true": out})
-        err_df["squared_error"] = (err_df["true"] - err_df["pred"]) ** 2
-        neg_rmse = -(pow(err_df["squared_error"].sum() / err_df.shape[0], 0.5))
-        
-        return neg_rmse
-    
-    else:
+    if export:
         RES_DF = pd.DataFrame(MOD_MAT, columns=MOD_DF.columns)
         RES_DF.to_csv(CONFIG["data"]["modelled_path"], index=False)
-        
+        return - log_likelihood / n_pred
+
+    else:   
+        return - log_likelihood / n_pred        
 
 if __name__=="__main__":
 
-    # find optimal parameters
-    opt_params = CONFIG["model"]["opt_params"]
-    optimiser = bayes_opt.BayesianOptimization(
-        f=model_data,
-        pbounds=opt_params["pbounds"],
-        random_state=opt_params["random_state"],
-        allow_duplicate_points=True
-    )
+    params = [
+        0.5, # K-factor - sensitivity of score change
+        400, # C-factor - sensitivity of expected outcome
+        0.5  # Driver-constructor weighting
+    ] 
 
-    optimiser.maximize(
-        init_points=opt_params["init_points"], 
-        n_iter=opt_params["n_iter"]
-    )
-    results = optimiser.max
+    result = optimize.minimize(model_data, params, method="L-BFGS-B", options={"disp": True})
+
     params_log = {
-        "k": float(results["params"]["k"]),
-        "c": float(results["params"]["c"]),
-        "w": float(results["params"]["w"])
-    }
-    metrics_log = {
-        "RMSE": float(-results["target"])
+        "k": result.x[0],
+        "c": result.x[1],
+        "w": result.x[2]
     }
 
-    #log metrics and params locally
+    metrics_log = {
+        "log_likelihood": model_data(result.x, export=True) # exports results for data reporting also
+    }
+
+    #log metrics and params
     with open(CONFIG["data"]["metrics_path"], "w") as out:
         json.dump(metrics_log, out)
 
     with open(CONFIG["data"]["params_path"], "w") as out:
         yaml.dump(params_log, out)
-
-    # create final model data
-    model_data(k=params_log["k"], c=params_log["c"], w=params_log["w"], export=True)
