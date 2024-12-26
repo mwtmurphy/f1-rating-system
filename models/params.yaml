@@ -1,25 +1,4 @@
-c: !!python/object/apply:numpy._core.multiarray.scalar
-- &id001 !!python/object/apply:numpy.dtype
-  args:
-  - f8
-  - false
-  - true
-  state: !!python/tuple
-  - 3
-  - <
-  - null
-  - null
-  - null
-  - -1
-  - -1
-  - 0
-- !!binary |
-  RcWyGOaHeEA=
-k: !!python/object/apply:numpy._core.multiarray.scalar
-- *id001
-- !!binary |
-  Vsr1gk0lW0A=
-w: !!python/object/apply:numpy._core.multiarray.scalar
-- *id001
-- !!binary |
-  BerC1YWL+z8=
+c: 400.6042976794986
+player_learning_rate: 39.84969656028886
+team_learning_rate: 32.15355289186867
+w: 3.751641328633288

@@ -31,6 +31,32 @@ MOD_MAT = MOD_DF.values
 DRI_RTG = {dri: CONFIG["model"]["start_score"] for dri in set(MOD_DF["driverId"])}
 CON_RTG = {con: CONFIG["model"]["start_score"] for con in set(MOD_DF["constructorYearId"])}
 
+class customRatingSystem():
+    '''Custom rating system for F1 drivers and constructors'''
+
+    def __init__(self, c: float, w: float, player_learning_rate: float, team_learning_rate: float):
+        self.c = c
+        self.w = w
+        self.player_lr = player_learning_rate
+        self.team_lr = team_learning_rate
+
+    def get_combo_rating(self, player_rating: float, team_rating: float) -> float:
+        '''Returns the combined rating of team and player'''
+        return player_rating + (self.w * team_rating)
+
+    def get_win_prob(self, rating_a: float, rating_b: float) -> float:
+        '''Returns the win probability of driver-constructor A over driver-constructor B'''
+        return 1 / (1 + np.exp(-(rating_a - rating_b) / self.c))
+    
+    def get_driver_rating_change(self, rating_change: float) -> float:
+        '''Returns updated driver rating'''
+        return self.player_lr * rating_change
+    
+    def get_team_rating_change(self, rating_change: float) -> float:
+        '''Returns updated team rating'''
+        return self.team_lr * rating_change
+
+
 def model_data(params: dict, export: bool = False) -> float:
     '''Returns mean negative log likelihood of the rating system. If
     export = True, also exports results for data reporting.'''
@@ -40,6 +66,7 @@ def model_data(params: dict, export: bool = False) -> float:
     exp, out = [], []
     log_likelihood = 0
     n_pred = 0
+    model = customRatingSystem(params[0], params[1], params[2], params[3])
 
     for start_ix, end_ix in IX_CHUNKS:
         yr_mat = MOD_MAT[start_ix:end_ix+1]
@@ -56,11 +83,11 @@ def model_data(params: dict, export: bool = False) -> float:
                 continue
 
             # get current rating
-            elo_a = dri_scores[dri_a] + (params[2] * con_scores[con_a])
-            elo_b = dri_scores[dri_b] + (params[2] * con_scores[con_b])
+            elo_a = model.get_combo_rating(dri_scores[dri_a], con_scores[con_a])
+            elo_b = model.get_combo_rating(dri_scores[dri_b], con_scores[con_b])
             
             # create expected scores
-            e_a = 1 / (1 + np.exp(-(elo_a - elo_b) / params[1]))
+            e_a = model.get_win_prob(elo_a, elo_b)
             e_b = 1 - e_a
 
             # create true scores and track log likelihood 
@@ -77,8 +104,8 @@ def model_data(params: dict, export: bool = False) -> float:
             n_pred += 1
                 
             # calculate score change and update round scores
-            diff_a = params[0] * (o_a - e_a)
-            diff_b = params[0] * (o_b - e_b)
+            diff_a = o_a - e_a
+            diff_b = -diff_a
 
             # log driver results and changes if neither retire due to car failure (not attributable to drivers)
             if "constructor retirement" not in [st_a, st_b]:
@@ -107,7 +134,7 @@ def model_data(params: dict, export: bool = False) -> float:
         # update driver values for finishing drivers and driver-caused retirements
         for dri in rnd_dri_scores.keys():
             if rnd_dri_scores[dri]["n"] != 0: # more than 1 car on grid
-                dri_scores[dri] += ((1 / (1 + params[2])) * rnd_dri_scores[dri]["diff"] / rnd_dri_scores[dri]["n"])
+                dri_scores[dri] += model.get_driver_rating_change(rnd_dri_scores[dri]["diff"] / rnd_dri_scores[dri]["n"])
 
         yr_mat[:, DSC_IX] = list(map(lambda el: dri_scores[el], yr_mat[:, DRI_IX])) # driver score
         yr_mat[:, EXP_IX] = list(map(lambda el: rnd_dri_scores[el]["exp"], yr_mat[:, DRI_IX])) # expected outcome
@@ -116,7 +143,7 @@ def model_data(params: dict, export: bool = False) -> float:
         # update constructor values for finishing drivers
         for con in rnd_con_scores.keys():
             if rnd_con_scores[con]["n"] != 0: # more than 1 car on grid
-                con_scores[con] += ((params[2] / (1 + params[2])) * rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
+                con_scores[con] += model.get_team_rating_change(rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
         
         yr_mat[:, CSC_IX] = list(map(lambda el: con_scores[el], yr_mat[:, CON_IX]))
 
@@ -126,31 +153,30 @@ def model_data(params: dict, export: bool = False) -> float:
         return - log_likelihood / n_pred
 
     else:   
-        return - log_likelihood / n_pred        
+        return - log_likelihood / n_pred
 
 if __name__=="__main__":
-
     params = [
-        0.5, # K-factor - sensitivity of score change
         400, # C-factor - sensitivity of expected outcome
-        0.5  # Driver-constructor weighting
-    ] 
-
+        0.5, # Driver-constructor weight
+        32,  # player learning rate
+        32   # team learning rate
+    ]
     result = optimize.minimize(model_data, params, method="L-BFGS-B", options={"disp": True})
+    print(result.x)
 
-    params_log = {
-        "k": result.x[0],
-        "c": result.x[1],
-        "w": result.x[2]
-    }
-
+    #log metrics and params and export results
     metrics_log = {
         "log_likelihood": model_data(result.x, export=True) # exports results for data reporting also
-    }
-
-    #log metrics and params
-    with open(CONFIG["data"]["metrics_path"], "w") as out:
+    } 
+    with open(CONFIG["data"]["metrics_path"], "w") as out:  
         json.dump(metrics_log, out)
 
+    params_log = {
+        "c": float(result.x[0]),
+        "w": float(result.x[1]),
+        "player_learning_rate": float(result.x[2]),
+        "team_learning_rate": float(result.x[3])
+    }
     with open(CONFIG["data"]["params_path"], "w") as out:
         yaml.dump(params_log, out)
