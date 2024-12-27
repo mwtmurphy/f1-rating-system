@@ -1,9 +1,7 @@
 import itertools
 import json
-import typing
 import yaml
 
-import bayes_opt
 import numpy as np
 import pandas as pd
 from scipy import optimize
