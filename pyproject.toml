@@ -6,7 +6,7 @@ authors = ["mwtmurphy <mwtmurphy@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.11.*"
+python = "3.12.*"
 streamlit = "^1.28.2"
 pandas = "^2.1.3"
 plotly = "^5.18.0"
