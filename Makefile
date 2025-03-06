@@ -1,6 +1,6 @@
 INT_DIR = data/interim
 RAW_DIR = data/raw
-SRC_DIR = src/f1_elo
+SRC_DIR = src/f1_rating_system
 
 app:
 	poetry run streamlit run ${SRC_DIR}/app.py

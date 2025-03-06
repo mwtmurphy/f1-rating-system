@@ -2,7 +2,7 @@
 name = "f1-rating-system"
 version = "0.1.0"
 description = ""
-authors = ["mwtmurphy <mitchell@motorway.co.uk>"]
+authors = ["mwtmurphy <mwtmurphy@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
