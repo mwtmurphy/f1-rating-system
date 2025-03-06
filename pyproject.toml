@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "f1-rating-system"
+name = "f1_rating_system"
 version = "0.1.0"
 description = ""
 authors = ["mwtmurphy <mwtmurphy@gmail.com>"]
