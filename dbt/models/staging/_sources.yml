@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: source
+    database: mwtmurphy-f1-rating-system
+    schema: source
+    tables:
+      - name: races
+      - name: results
+      - name: constructor_year

@@ -29,3 +29,21 @@ resource "google_bigquery_dataset_iam_member" "streamlit_viewer" {
   role       = "roles/bigquery.dataViewer"
   member     = "serviceAccount:${google_service_account.streamlit.email}"
 }
+
+# ── GCS bucket for Ergast API CSVs ───────────────────────────────────────────
+
+resource "google_storage_bucket" "raw_data" {
+  name                        = "mwtmurphy-f1-rating-system-ergast-api-data"
+  location                    = var.region
+  uniform_bucket_level_access = true
+
+  labels = {
+    source = "ergast-api"
+  }
+}
+
+resource "google_storage_bucket_iam_member" "streamlit_gcs_reader" {
+  bucket = google_storage_bucket.raw_data.name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.streamlit.email}"
+}

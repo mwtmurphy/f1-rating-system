@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: int_race_results
+    description: >
+      Preprocessed race results joining races, results, and constructor_year.
+      Equivalent to the output of data.py's preprocess_data() function.
+      Null positions indicate drivers who did not finish.
+      Constructor year IDs fall back to constructor IDs where no year-specific mapping exists.
+    columns:
+      - name: year
+        description: Season year.
+        tests:
+          - not_null
+      - name: round
+        description: Round number within the season.
+        tests:
+          - not_null
+      - name: date
+        description: Date the race took place.
+      - name: constructor_id
+        description: Unique identifier for the constructor.
+        tests:
+          - not_null
+      - name: constructor_year_id
+        description: Year-scoped constructor identifier, falling back to constructor_id if no mapping exists.
+        tests:
+          - not_null
+      - name: driver_id
+        description: Unique identifier for the driver.
+        tests:
+          - not_null
+      - name: grid
+        description: Starting grid position.
+      - name: position
+        description: Finishing position. NULL if the driver did not finish.
+      - name: status_id
+        description: Foreign key to the status table describing the race outcome.

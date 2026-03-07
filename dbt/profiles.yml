@@ -1,0 +1,10 @@
+f1_rating_system:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: mwtmurphy-f1-rating-system
+      dataset: staging
+      location: EU
+      threads: 4
