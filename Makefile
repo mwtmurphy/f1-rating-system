@@ -26,6 +26,9 @@ data_report: ${INT_DIR}/modelled_data.csv
 env:
 	poetry install
 
+lint:
+	poetry run sqlfluff lint dbt/models/
+
 major:
 	poetry version patch
 

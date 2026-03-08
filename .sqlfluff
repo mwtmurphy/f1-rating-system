@@ -1,0 +1,19 @@
+[sqlfluff]
+dialect = bigquery
+templater = dbt
+sql_file_exts = .sql
+
+[sqlfluff:templater:dbt]
+project_dir = ./dbt
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = upper
+
+[sqlfluff:rules:aliasing.length]
+min_alias_chars = 2
