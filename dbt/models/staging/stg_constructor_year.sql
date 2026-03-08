@@ -1,5 +1,5 @@
 select
-    constructorYearId as constructor_year_id,
+    COALESCE(constructorYearId, constructorId) as constructor_year_id,
     constructorId as constructor_id,
     year
 
