@@ -5,6 +5,10 @@ sources:
     database: mwtmurphy-f1-rating-system
     schema: source
     tables:
+      - name: constructors
+      - name: constructor_colours
+      - name: constructor_year
+      - name: drivers
       - name: races
       - name: results
-      - name: constructor_year
+      - name: status

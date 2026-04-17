@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: stg_races
+  - name: stg_ergast__races
     description: Cleaned race schedule data from the Ergast API source.
     columns:
       - name: race_id
@@ -20,11 +20,11 @@ models:
       - name: date
         description: Date the race took place.
 
-  - name: stg_results
+  - name: stg_ergast__race_results
     description: Cleaned race result data from the Ergast API source.
     columns:
       - name: race_id
-        description: Foreign key to stg_races.
+        description: Foreign key to stg_ergast__races.
         tests:
           - not_null
       - name: constructor_id
@@ -42,7 +42,7 @@ models:
       - name: status_id
         description: Foreign key to the status table describing the race outcome.
 
-  - name: stg_constructor_year
+  - name: stg_ergast__constructor_year
     description: Custom lookup mapping constructor identities to a year-specific ID, tracking name/entity changes across seasons.
     columns:
       - name: constructor_id
@@ -55,5 +55,18 @@ models:
           - not_null
       - name: constructor_year_id
         description: Year-scoped constructor identifier.
+        tests:
+          - not_null
+
+  - name: stg_ergast__race_statuses
+    description: Race finish statuses for a driver.
+    columns:
+      - name: status_id
+        description: Unique identifier for the race finish status.
+        tests:
+          - not_null
+          - unique
+      - name: status
+        description: Lowercased status label describing the race outcome.
         tests:
           - not_null

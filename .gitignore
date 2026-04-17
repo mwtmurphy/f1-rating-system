@@ -174,3 +174,6 @@ terraform/.terraform/
 terraform/.terraform.lock.hcl
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
+
+# dbt local files
+dbt/.user.yml
