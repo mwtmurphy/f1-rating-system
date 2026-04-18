@@ -1,0 +1,13 @@
+version: 2
+
+exposures:
+  - name: predicted_ratings_model
+    label: Predicted Ratings Model
+    type: ml
+    description: >
+      Python rating system (model.py) that reads int_race_results, computes Elo-style
+      driver and constructor ratings, and writes results to int_predicted_ratings.
+    depends_on:
+      - ref('int_race_results')
+    owner:
+      email: mwtmurphy@gmail.com

@@ -3,36 +3,63 @@ version: 2
 models:
   - name: int_race_results
     description: >
-      Preprocessed race results joining races, results, and constructor_year.
-      Equivalent to the output of data.py's preprocess_data() function.
-      Null positions indicate drivers who did not finish.
-      Constructor year IDs fall back to constructor IDs where no year-specific mapping exists.
+      Race results with features derived from features.py: map position (grid rank per race),
+      map points (F1 points system applied to map position), and classified race status.
+      Equivalent to the output of features.py's create_features() function.
     columns:
-      - name: year
-        description: Season year.
+      - name: race_result_id
+        description: Surrogate key joining to int_predicted_ratings. Format — "{race_id}_{driver_id}".
         tests:
           - not_null
-      - name: round
-        description: Round number within the season.
-        tests:
-          - not_null
-      - name: date
-        description: Date the race took place.
-      - name: constructor_id
-        description: Unique identifier for the constructor.
+          - unique
+      - name: race_id
+        description: Unique identifier for the race.
         tests:
           - not_null
       - name: constructor_year_id
         description: Year-scoped constructor identifier, falling back to constructor_id if no mapping exists.
         tests:
           - not_null
+      - name: constructor_id
+        description: Unique identifier for the constructor.
+        tests:
+          - not_null
       - name: driver_id
         description: Unique identifier for the driver.
         tests:
           - not_null
-      - name: grid
-        description: Starting grid position.
-      - name: position
-        description: Finishing position. NULL if the driver did not finish.
-      - name: status_id
-        description: Foreign key to the status table describing the race outcome.
+      - name: race_year
+        description: Season year.
+        tests:
+          - not_null
+      - name: year_round
+        description: Round number within the season.
+        tests:
+          - not_null
+      - name: race_date
+        description: Date the race took place.
+      - name: map_position
+        description: Driver's rank within the race ordered by starting grid position.
+      - name: map_points
+        description: F1 points (25/18/15/12/10/8/6/4/2/1) awarded based on map_position; 0 outside top 10.
+      - name: race_status
+        description: >
+          Classified finish status: 'finished', 'driver retirement',
+          'constructor retirement', 'misc retirement', or original status string.
+
+  - name: int_predicted_ratings
+    description: >
+      Predicted driver and constructor ratings produced by model.py (see exposure:
+      predicted_ratings_model). Populated externally — not managed by dbt SQL.
+      Joins to int_race_results on race_result_id (one-to-one).
+    columns:
+      - name: race_result_id
+        description: Surrogate key joining to int_race_results. Format — "{race_id}_{driver_id}".
+      - name: constructor_score
+        description: Updated constructor Elo rating after the race.
+      - name: driver_score
+        description: Updated driver Elo rating after the race.
+      - name: expected
+        description: Sum of expected win probabilities for this driver across all pairings in the race.
+      - name: actual
+        description: Sum of actual win outcomes for this driver across all pairings in the race.

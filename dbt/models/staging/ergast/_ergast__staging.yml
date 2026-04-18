@@ -59,14 +59,20 @@ models:
           - not_null
 
   - name: stg_ergast__race_statuses
-    description: Race finish statuses for a driver.
+    description: Race finish statuses for a driver, with classification into retirement groups.
     columns:
       - name: status_id
         description: Unique identifier for the race finish status.
         tests:
           - not_null
           - unique
-      - name: status
-        description: Lowercased status label describing the race outcome.
+      - name: driver_status
+        description: Lowercased raw status label from the source.
+        tests:
+          - not_null
+      - name: driver_status_group
+        description: >
+          Classified status group: 'finished', 'driver retirement',
+          'constructor retirement', 'misc retirement', or the original status if unclassified.
         tests:
           - not_null
