@@ -4,30 +4,35 @@ import yaml
 
 import numpy as np
 import pandas as pd
+from google.cloud import bigquery
 from scipy import optimize
 
 
-# global variables
+PROJECT_ID = "mwtmurphy-f1-rating-system"
+
 with open("params.yaml") as conf_file:
     CONFIG = yaml.safe_load(conf_file)
 
 # column indexes
-CON_IX = 4 # constructor id
-DRI_IX = 5 # driver id
-POS_IX = 6 # driver position
-STA_IX = 8 # race status
-CSC_IX = 9 # new constructor score
-DSC_IX = 10 # new driver score
-EXP_IX = 11 # expected outcome
-TRU_IX = 12 # true outcome
+CON_IX = 2   # constructor_year_id
+DRI_IX = 4   # driver_id
+POS_IX = 8   # map_position
+STA_IX = 9   # race_status
+CSC_IX = 11  # new constructor score
+DSC_IX = 12  # new driver score
+EXP_IX = 13  # expected outcome
+TRU_IX = 14  # true outcome
 
-MOD_DF = pd.read_csv(CONFIG["data"]["features_path"])
+_client = bigquery.Client(project=PROJECT_ID)
+MOD_DF = _client.query(
+    "SELECT * FROM `mwtmurphy-f1-rating-system.intermediate.int_race_results`"
+).to_dataframe()
 MOD_DF[["constructorScore", "driverScore", "expected", "actual"]] = None
-IX_CHUNKS = MOD_DF.reset_index().groupby(["year", "round"])["index"].agg(["min", "max"]).values
+IX_CHUNKS = MOD_DF.reset_index().groupby(["race_year", "year_round"])["index"].agg(["min", "max"]).values
 MOD_MAT = MOD_DF.values
 
-DRI_RTG = {dri: CONFIG["model"]["start_score"] for dri in set(MOD_DF["driverId"])}
-CON_RTG = {con: CONFIG["model"]["start_score"] for con in set(MOD_DF["constructorYearId"])}
+DRI_RTG = {dri: CONFIG["model"]["start_score"] for dri in set(MOD_DF["driver_id"])}
+CON_RTG = {con: CONFIG["model"]["start_score"] for con in set(MOD_DF["constructor_year_id"])}
 
 class customRatingSystem():
     '''Custom rating system for F1 drivers and constructors'''
@@ -45,11 +50,11 @@ class customRatingSystem():
     def get_win_prob(self, rating_a: float, rating_b: float) -> float:
         '''Returns the win probability of driver-constructor A over driver-constructor B'''
         return 1 / (1 + np.exp(-(rating_a - rating_b) / self.c))
-    
+
     def get_driver_rating_change(self, rating_change: float) -> float:
         '''Returns updated driver rating'''
         return self.player_lr * rating_change
-    
+
     def get_team_rating_change(self, rating_change: float) -> float:
         '''Returns updated team rating'''
         return self.team_lr * rating_change
@@ -75,7 +80,7 @@ def model_data(params: dict, export: bool = False) -> float:
         for ix_1, ix_2 in itertools.combinations(range(yr_mat.shape[0]), 2):
             con_a, dri_a, pos_a, st_a = yr_mat[ix_1, [CON_IX, DRI_IX, POS_IX, STA_IX]]
             con_b, dri_b, pos_b, st_b = yr_mat[ix_2, [CON_IX, DRI_IX, POS_IX, STA_IX]]
-    
+
             # continue if drivers in same car or a driver does not finish for misc reason
             if pos_a == pos_b or "misc retirement" in [st_a, st_b]:
                 continue
@@ -83,12 +88,12 @@ def model_data(params: dict, export: bool = False) -> float:
             # get current rating
             elo_a = model.get_combo_rating(dri_scores[dri_a], con_scores[con_a])
             elo_b = model.get_combo_rating(dri_scores[dri_b], con_scores[con_b])
-            
+
             # create expected scores
             e_a = model.get_win_prob(elo_a, elo_b)
             e_b = 1 - e_a
 
-            # create true scores and track log likelihood 
+            # create true scores and track log likelihood
             if pos_a < pos_b:
                 o_a = 1
                 o_b = 0
@@ -100,7 +105,7 @@ def model_data(params: dict, export: bool = False) -> float:
                 log_likelihood += np.log(max(e_b, 1E-10))
 
             n_pred += 1
-                
+
             # calculate score change and update round scores
             diff_a = o_a - e_a
             diff_b = -diff_a
@@ -116,19 +121,19 @@ def model_data(params: dict, export: bool = False) -> float:
                 rnd_dri_scores[dri_b]["act"] += o_b
                 rnd_dri_scores[dri_b]["diff"] += diff_b
                 rnd_dri_scores[dri_b]["n"] += 1
-            
+
             # log constructor changes if diff constructors and neither driver retires due to driver error (not attributable to constructors)
             if con_a != con_b and "driver retirement" not in [st_a, st_b]:
                 rnd_con_scores[con_a]["diff"] += diff_a
                 rnd_con_scores[con_a]["n"] += 1
-    
+
                 rnd_con_scores[con_b]["diff"] += diff_b
                 rnd_con_scores[con_b]["n"] += 1
-                
+
             # store expected and final values for error analysis
             exp += [e_a, e_b]
             out += [o_a, o_b]
-        
+
         # update driver values for finishing drivers and driver-caused retirements
         for dri in rnd_dri_scores.keys():
             if rnd_dri_scores[dri]["n"] != 0: # more than 1 car on grid
@@ -142,15 +147,22 @@ def model_data(params: dict, export: bool = False) -> float:
         for con in rnd_con_scores.keys():
             if rnd_con_scores[con]["n"] != 0: # more than 1 car on grid
                 con_scores[con] += model.get_team_rating_change(rnd_con_scores[con]["diff"] / rnd_con_scores[con]["n"])
-        
+
         yr_mat[:, CSC_IX] = list(map(lambda el: con_scores[el], yr_mat[:, CON_IX]))
 
     if export:
         RES_DF = pd.DataFrame(MOD_MAT, columns=MOD_DF.columns)
-        RES_DF.to_csv(CONFIG["data"]["modelled_path"], index=False)
+        pred_df = RES_DF[
+            ["race_result_id", "constructorScore", "driverScore", "expected", "actual"]
+        ].rename(columns={"constructorScore": "constructor_score", "driverScore": "driver_score"})
+        _client.load_table_from_dataframe(
+            pred_df,
+            "mwtmurphy-f1-rating-system.intermediate.int_predicted_ratings",
+            job_config=bigquery.LoadJobConfig(write_disposition="WRITE_TRUNCATE"),
+        ).result()
         return - log_likelihood / n_pred
 
-    else:   
+    else:
         return - log_likelihood / n_pred
 
 if __name__=="__main__":
@@ -166,8 +178,8 @@ if __name__=="__main__":
     #log metrics and params and export results
     metrics_log = {
         "log_likelihood": model_data(result.x, export=True) # exports results for data reporting also
-    } 
-    with open(CONFIG["data"]["metrics_path"], "w") as out:  
+    }
+    with open(CONFIG["data"]["metrics_path"], "w") as out:
         json.dump(metrics_log, out)
 
     params_log = {
